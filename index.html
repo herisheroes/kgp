@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Moto Racing 3D</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif; /* Font gaya sci-fi/racing */
+            background-color: #1a1a1a;
+            color: white;
+            user-select: none;
+        }
+
+        /* Tampilan 3D Canvas */
+        #game-canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; /* Agar klik tembus ke tombol di bawah */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* HUD Atas: Jarak & Speed */
+        #hud-top {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-label { font-size: 14px; color: #aaa; }
+        .stat-value { font-size: 24px; color: #00eaff; text-shadow: 0 0 10px #00eaff; }
+        .stat-value.danger { color: #ff3333; text-shadow: 0 0 10px #ff3333; }
+
+        /* Progress Bar Balapan */
+        #progress-container {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 10px;
+            background: #333;
+            border: 2px solid #555;
+            border-radius: 5px;
+        }
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00eaff, #00ff66);
+            transition: width 0.2s;
+        }
+        #finish-flag {
+            position: absolute;
+            right: -10px;
+            top: -15px;
+            font-size: 20px;
+        }
+
+        /* Panel Soal (Math) */
+        #math-panel {
+            pointer-events: auto; /* Aktifkan klik */
+            align-self: center;
+            margin-bottom: 50px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #00eaff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 234, 255, 0.3);
+            display: none; /* Sembunyi saat start */
+        }
+
+        #question-text {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.1s;
+        }
+
+        .option-btn:hover { background: #333; border-color: #00eaff; }
+        .option-btn:active { transform: scale(0.95); }
+
+        /* Feedback Benar/Salah */
+        #feedback {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        /* Layar Start & Game Over */
+        #start-screen, #game-over-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        h1 { color: #00eaff; font-size: 40px; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 5px; text-align: center;}
+        p { color: #ccc; max-width: 500px; text-align: center; line-height: 1.5; }
+        
+        .action-btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 24px;
+            background: #00eaff;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00eaff;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .hide { display: none !important; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px #00eaff; }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px #00eaff; }
+            100% { transform: scale(1); box-shadow: 0 0 20px #00eaff; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+        <h1>Math Moto Racing</h1>
+        <p>Jawab soal matematika dengan cepat untuk mempercepat motormu!</p>
+        <p>
+            <span style="color:#00ff66">Benar</span> = Speed Boost & Combo Naik<br>
+            <span style="color:#ff3333">Salah</span> = Speed Reset & Kehilangan Combo
+        </p>
+        <button class="action-btn" onclick="startGame()">START RACE</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="hide">
+        <h1 id="result-title">FINISH!</h1>
+        <p id="result-desc">Kamu juara 1!</p>
+        <div class="stat-box" style="margin-top: 20px;">
+            <div class="stat-label">Total Benar</div>
+            <div class="stat-value" id="final-score">0</div>
+        </div>
+        <button class="action-btn" onclick="location.reload()">MAIN LAGI</button>
+    </div>
+
+    <!-- UI Layer In-Game -->
+    <div id="ui-layer">
+        <div id="hud-top">
+            <div class="stat-box">
+                <div class="stat-label">SPEED</div>
+                <div class="stat-value" id="speed-display">0 km/h</div>
+            </div>
+            
+            <div id="progress-container">
+                <div id="progress-fill"></div>
+                <div id="finish-flag">🏁</div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-label">COMBO</div>
+                <div class="stat-value" id="combo-display">x0</div>
+            </div>
+        </div>
+
+        <div id="feedback">PERFECT!</div>
+
+        <div id="math-panel">
+            <div id="question-text">10 + 5 = ?</div>
+            <div id="options-container">
+                <button class="option-btn" onclick="checkAnswer(0)">15</button>
+                <button class="option-btn" onclick="checkAnswer(1)">20</button>
+                <button class="option-btn" onclick="checkAnswer(2)">12</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- KONFIGURASI GAME ---
+        const GAME_CONFIG = {
+            baseSpeed: 0.5,
+            maxSpeed: 3.0,
+            boostAmount: 0.3,
+            aiBaseSpeed: 0.8,    // AI punya kecepatan dasar yang stabil
+            aiMaxSpeed: 1.2,     // AI tidak terlalu ngebut, tapi konsisten
+            raceDistance: 2000,  // Jarak total balapan
+        };
+
+        // --- VARIABEL GLOBAL ---
+        let scene, camera, renderer;
+        let road, playerBike, aiBike;
+        let particles = [];
+        
+        let gameState = {
+            isPlaying: false,
+            playerDistance: 0,
+            aiDistance: 0,
+            playerSpeed: 0,
+            aiSpeed: GAME_CONFIG.aiBaseSpeed,
+            combo: 0,
+            score: 0,
+            currentCorrectIndex: 0
+        };
+
+        // --- INIT 3D WORLD ---
+        function init() {
+            // 1. Scene Setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050510); // Langit malam gelap
+            scene.fog = new THREE.Fog(0x050510, 10, 50);
+
+            // 2. Camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 3, 6);
+            camera.rotation.x = -0.3;
+
+            // 3. Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+            renderer.domElement.id = "game-canvas";
+
+            // 4. Cahaya
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+            dirLight.position.set(5, 10, 7);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            // 5. Jalan Raya (Infinite Scrolling Texture)
+            createRoad();
+
+            // 6. Motor Player (Biru) & AI (Merah)
+            playerBike = createBike(0x00eaff); 
+            playerBike.position.set(-1.5, 0, 0); // Kiri
+            scene.add(playerBike);
+
+            aiBike = createBike(0xff3333);
+            aiBike.position.set(1.5, 0, 0); // Kanan
+            scene.add(aiBike);
+
+            // 7. Partikel Kecepatan (Garis putih di pinggir)
+            createParticles();
+
+            // 8. Event Resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Loop Render
+            animate();
+        }
+
+        // --- FUNGSI PEMBUATAN ASET 3D ---
+        
+        function createRoad() {
+            // Kita buat tekstur jalan menggunakan HTML Canvas agar tidak perlu load gambar luar
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const context = canvas.getContext('2d');
+
+            // Warna aspal
+            context.fillStyle = '#222';
+            context.fillRect(0, 0, 512, 512);
+
+            // Garis pinggir
+            context.fillStyle = '#fff';
+            context.fillRect(0, 0, 10, 512);
+            context.fillRect(502, 0, 10, 512);
+
+            // Garis tengah putus-putus
+            context.fillStyle = '#ffaa00';
+            context.fillRect(251, 0, 10, 256); // Hanya separuh agar terlihat putus saat di-loop
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(1, 10); // Ulang 10 kali ke depan
+
+            const geometry = new THREE.PlaneGeometry(20, 200);
+            const material = new THREE.MeshStandardMaterial({ 
+                map: texture,
+                roughness: 0.8
+            });
+            
+            road = new THREE.Mesh(geometry, material);
+            road.rotation.x = -Math.PI / 2;
+            road.position.z = -50; // Tarik ke depan
+            scene.add(road);
+
+            road.userData = { texture: texture }; // Simpan referensi untuk animasi
+        }
+
+        function createBike(colorHex) {
+            const bikeGroup = new THREE.Group();
+
+            // Badan Motor (Body) - Bentuk futuristik sederhana
+            const bodyGeo = new THREE.BoxGeometry(0.8, 0.5, 1.8);
+            const bodyMat = new THREE.MeshPhongMaterial({ color: colorHex, shininess: 100 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.5;
+            body.castShadow = true;
+            bikeGroup.add(body);
+
+            // Kaca depan
+            const windGeo = new THREE.BoxGeometry(0.6, 0.3, 0.5);
+            const windMat = new THREE.MeshPhongMaterial({ color: 0x000000, opacity: 0.7, transparent: true });
+            const wind = new THREE.Mesh(windGeo, windMat);
+            wind.position.set(0, 0.8, -0.4);
+            wind.rotation.x = -0.5;
+            bikeGroup.add(wind);
+
+            // Roda (Menggunakan Torus agar terlihat bolong tengahnya ala Tron)
+            const wheelGeo = new THREE.TorusGeometry(0.35, 0.15, 8, 16);
+            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: colorHex, emissiveIntensity: 0.5 });
+            
+            const frontWheel = new THREE.Mesh(wheelGeo, wheelMat);
+            frontWheel.rotation.y = Math.PI / 2;
+            frontWheel.position.set(0, 0.35, -0.9);
+            bikeGroup.add(frontWheel);
+
+            const backWheel = new THREE.Mesh(wheelGeo, wheelMat);
+            backWheel.rotation.y = Math.PI / 2;
+            backWheel.position.set(0, 0.35, 0.9);
+            bikeGroup.add(backWheel);
+
+            // Efek cahaya mesin (Trail)
+            const trailGeo = new THREE.BoxGeometry(0.2, 0.1, 0.5);
+            const trailMat = new THREE.MeshBasicMaterial({ color: colorHex });
+            const trail = new THREE.Mesh(trailGeo, trailMat);
+            trail.position.set(0, 0.4, 1.0);
+            bikeGroup.add(trail);
+
+            return bikeGroup;
+        }
+
+        function createParticles() {
+            const geometry = new THREE.BufferGeometry();
+            const count = 100;
+            const positions = new Float32Array(count * 3);
+
+            for (let i = 0; i < count; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 30; // X lebar
+                positions[i * 3 + 1] = Math.random() * 5;      // Y tinggi
+                positions[i * 3 + 2] = -Math.random() * 100;   // Z kedalaman
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1, transparent: true, opacity: 0.5 });
+            
+            const points = new THREE.Points(geometry, material);
+            scene.add(points);
+            particles.push(points);
+        }
+
+        // --- GAME LOOP & LOGIC ---
+
+        function updateGameLogic() {
+            if (!gameState.isPlaying) return;
+
+            // 1. Update Jarak
+            // Kecepatan berkurang perlahan (friction) jika tidak jawab soal, tapi tidak sampai 0
+            if (gameState.playerSpeed > GAME_CONFIG.baseSpeed) {
+                gameState.playerSpeed -= 0.002;
+            }
+            
+            // AI Logic: AI sedikit lebih cepat di akhir ("Rubber banding")
+            let aiCurrentSpeed = gameState.aiSpeed;
+            if (gameState.aiDistance < gameState.playerDistance) {
+                 aiCurrentSpeed *= 1.05; // AI ngebut dikit kalau ketinggalan
+            }
+
+            gameState.playerDistance += gameState.playerSpeed;
+            gameState.aiDistance += aiCurrentSpeed;
+
+            // 2. Animasi Visual Jalan (Tekstur bergerak mundur)
+            // Kecepatan visual diambil dari kecepatan player
+            road.userData.texture.offset.y -= (gameState.playerSpeed * 0.02);
+
+            // 3. Posisi Visual Motor AI
+            // Kita tidak menggerakkan player (player tetap di Z=0 relatif kamera),
+            // Kita menggerakkan AI maju/mundur relatif terhadap player.
+            const distanceDiff = gameState.aiDistance - gameState.playerDistance;
+            
+            // Batasi agar AI tidak hilang terlalu jauh dari pandangan
+            let visualZ = distanceDiff * 0.5; 
+            // Clamp posisi visual AI (misal max 20 unit di depan/belakang)
+            if (visualZ > 20) visualZ = 20;
+            if (visualZ < -10) visualZ = -10;
+
+            // Lerp posisi AI biar halus
+            aiBike.position.z += ( -visualZ - aiBike.position.z ) * 0.1;
+
+            // 4. Efek Goyang (Shake) saat kecepatan tinggi
+            const shake = (gameState.playerSpeed - GAME_CONFIG.baseSpeed) * 0.02;
+            camera.position.x = (Math.random() - 0.5) * shake;
+            camera.position.y = 3 + (Math.random() - 0.5) * shake;
+
+            // 5. Update UI
+            updateHUD();
+
+            // 6. Cek Finish
+            checkFinish();
+        }
+
+        function updateHUD() {
+            // Speedometer (hanya kosmetik visual)
+            const displaySpeed = Math.floor(gameState.playerSpeed * 100);
+            document.getElementById('speed-display').innerText = displaySpeed + " km/h";
+
+            // Progress Bar
+            const playerPct = (gameState.playerDistance / GAME_CONFIG.raceDistance) * 100;
+            document.getElementById('progress-fill').style.width = Math.min(playerPct, 100) + "%";
+            
+            // Combo
+            document.getElementById('combo-display').innerText = "x" + gameState.combo;
+        }
+
+        function checkFinish() {
+            if (gameState.playerDistance >= GAME_CONFIG.raceDistance || gameState.aiDistance >= GAME_CONFIG.raceDistance) {
+                endGame();
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            updateGameLogic();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- SISTEM MATEMATIKA ---
+
+        // Expose function ke window agar bisa dipanggil HTML button
+        window.startGame = function() {
+            document.getElementById('start-screen').classList.add('hide');
+            document.getElementById('math-panel').style.display = 'block';
+            
+            // Reset Game
+            gameState.isPlaying = true;
+            gameState.playerDistance = 0;
+            gameState.aiDistance = 0;
+            gameState.playerSpeed = GAME_CONFIG.baseSpeed;
+            gameState.combo = 0;
+            gameState.score = 0;
+            
+            generateQuestion();
+        };
+
+        window.checkAnswer = function(index) {
+            if (!gameState.isPlaying) return;
+
+            const feedbackEl = document.getElementById('feedback');
+            
+            if (index === gameState.currentCorrectIndex) {
+                // BENAR
+                gameState.combo++;
+                gameState.score++;
+                
+                // Tambah kecepatan (Makin tinggi combo, makin kencang)
+                const boost = GAME_CONFIG.boostAmount + (gameState.combo * 0.05);
+                gameState.playerSpeed = Math.min(gameState.playerSpeed + boost, GAME_CONFIG.maxSpeed);
+
+                // Visual Feedback
+                feedbackEl.innerText = "NICE! SPEED UP!";
+                feedbackEl.style.color = "#00ff66";
+            } else {
+                // SALAH
+                gameState.combo = 0; // Reset Combo
+                gameState.playerSpeed = GAME_CONFIG.baseSpeed; // Reset Speed (Hukuman berat)
+                
+                // Visual Feedback
+                feedbackEl.innerText = "WRONG! SLOW DOWN!";
+                feedbackEl.style.color = "#ff3333";
+            }
+
+            // Animasi Feedback
+            feedbackEl.style.opacity = 1;
+            setTimeout(() => { feedbackEl.style.opacity = 0; }, 800);
+
+            generateQuestion();
+        };
+
+        function generateQuestion() {
+            // Kesulitan bertambah setiap 3 combo
+            const difficultyLevel = Math.floor(gameState.combo / 3) + 1;
+            
+            // Range angka berdasarkan kesulitan
+            const maxNumber = difficultyLevel * 10; 
+            const minNumber = (difficultyLevel - 1) * 5;
+
+            const numA = Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber + 1;
+            const numB = Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber + 1;
+            
+            const correctAnswer = numA + numB;
+
+            // Generate 2 jawaban salah yang "mirip" (misal +/- 1 atau 2)
+            let wrong1 = correctAnswer + Math.floor(Math.random() * 5) + 1;
+            let wrong2 = correctAnswer - Math.floor(Math.random() * 5) - 1;
+            
+            // Pastikan tidak ada jawaban duplikat atau negatif
+            if (wrong2 < 0) wrong2 = correctAnswer + 10;
+            if (wrong1 === wrong2) wrong1 += 1;
+
+            // Acak posisi jawaban
+            const options = [correctAnswer, wrong1, wrong2];
+            // Shuffle array sederhana
+            options.sort(() => Math.random() - 0.5);
+
+            // Simpan index jawaban benar
+            gameState.currentCorrectIndex = options.indexOf(correctAnswer);
+
+            // Render ke HTML
+            document.getElementById('question-text').innerText = `${numA} + ${numB} = ?`;
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons[0].innerText = options[0];
+            buttons[1].innerText = options[1];
+            buttons[2].innerText = options[2];
+        }
+
+        function endGame() {
+            gameState.isPlaying = false;
+            document.getElementById('math-panel').style.display = 'none';
+            const gameOverScreen = document.getElementById('game-over-screen');
+            gameOverScreen.classList.remove('hide');
+
+            const resultTitle = document.getElementById('result-title');
+            const resultDesc = document.getElementById('result-desc');
+            const finalScore = document.getElementById('final-score');
+
+            if (gameState.playerDistance > gameState.aiDistance) {
+                resultTitle.innerText = "VICTORY!";
+                resultTitle.style.color = "#00ff66";
+                resultDesc.innerText = "Kamu berhasil mengalahkan lawan!";
+            } else {
+                resultTitle.innerText = "DEFEAT";
+                resultTitle.style.color = "#ff3333";
+                resultDesc.innerText = "Lawan mencapai garis finish duluan.";
+            }
+            
+            finalScore.innerText = gameState.score;
+        }
+
+        // Jalankan inisialisasi
+        init();
+
+    </script>
+</body>
+</html>
