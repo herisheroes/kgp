@@ -1,923 +1,1504 @@
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Math Moto Racing 3D: Ultimate</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Orbitron', sans-serif;
-            background-color: #050510;
-            color: white;
-            user-select: none;
-            touch-action: none;
-        }
+<meta charset="UTF-8">
 
-        /* --- LAYOUT UTAMA --- */
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+<title>Math Moto Racing 3D: Championship Edition</title>
 
-        /* --- UI OVERLAYS (MENU) --- */
-        .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s;
-        }
+<style>
 
-        .hide { display: none !important; }
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
-        h1 { color: #00eaff; font-size: 4vmin; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
-        h2 { color: #fff; font-size: 2.5vmin; margin-bottom: 30px; }
-        p { color: #ccc; max-width: 600px; text-align: center; font-size: 1.5vmin; line-height: 1.5; margin-bottom: 20px;}
 
-        /* Tombol & Pilihan */
-        .btn-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-        
-        .action-btn {
-            padding: 1.5vmin 4vmin;
-            font-size: 2vmin;
-            background: transparent;
-            color: #00eaff;
-            border: 2px solid #00eaff;
-            border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-        }
+body {
 
-        .action-btn:hover, .action-btn.active {
-            background: #00eaff;
-            color: #000;
-            box-shadow: 0 0 20px #00eaff;
-            transform: scale(1.05);
-        }
+margin: 0;
 
-        .level-card {
-            background: #222;
-            border: 1px solid #444;
-            padding: 20px;
-            margin: 10px;
-            border-radius: 10px;
-            width: 200px;
-            text-align: center;
-            cursor: pointer;
-            opacity: 0.5;
-            pointer-events: none;
-        }
+overflow: hidden;
 
-        .level-card.unlocked { opacity: 1; pointer-events: auto; border-color: #00eaff; }
-        .level-card:hover { background: #333; transform: translateY(-5px); }
+font-family: 'Orbitron', sans-serif;
 
-        /* --- IN-GAME SPLIT SCREEN UI --- */
-        #game-ui {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* Biar tembus ke canvas */
-            display: grid;
-            /* Grid diatur lewat JS dan class */
-        }
+background-color: #050510;
 
-        /* Konfigurasi Grid Vertikal */
-        .grid-1 { grid-template-columns: 1fr; }
-        .grid-2 { grid-template-columns: 1fr 1fr; }
-        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-        .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+color: white;
 
-        .player-panel {
-            position: relative;
-            border-right: 2px solid #333; /* Pemisah antar layar */
-            box-sizing: border-box;
-            pointer-events: none;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end; 
-            padding: 10px;
-        }
-        
-        .player-panel:last-child { border-right: none; }
+user-select: none;
 
-        /* Warna Identitas Player di HUD */
-        .p-color-bar {
-            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
-        }
+touch-action: none;
 
-        /* HUD Info */
-        .hud-top {
-            position: absolute;
-            top: 15px; left: 10px; right: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+}
 
-        .hud-info-box {
-            background: rgba(0,0,0,0.6);
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 1.5vmin;
-            text-align: left;
-        }
 
-        .speed-box {
-            text-align: right;
-            font-size: 2vmin;
-            color: #fff;
-            text-shadow: 0 0 5px currentColor;
-        }
+#game-container { position: relative; width: 100vw; height: 100vh; }
 
-        .timer-display {
-            font-family: monospace;
-            font-size: 1.8vmin;
-            color: #ffd700;
-            margin-top: 5px;
-        }
+canvas { display: block; width: 100%; height: 100%; }
 
-        /* MINIMAP (Vertical Bar) */
-        .minimap-container {
-            position: relative;
-            width: 10px;
-            height: 100px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid #555;
-            border-radius: 5px;
-            margin-left: 10px;
-        }
-        
-        .minimap-marker {
-            position: absolute;
-            left: -3px;
-            width: 16px; height: 4px;
-            background: red;
-            transition: bottom 0.2s linear;
-        }
 
-        /* Math Panel */
-        .math-box {
-            pointer-events: auto;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid #fff;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            width: 90%;
-            margin: 0 auto 20px auto;
-            align-self: center;
-            z-index: 20;
-        }
+/* UI OVERLAYS */
 
-        .math-question { font-size: 3vmin; margin-bottom: 10px; color: #fff; }
-        
-        .math-options {
-            display: grid;
-            grid-template-columns: 1fr; /* Default 1 kolom biar aman di layar sempit */
-            gap: 5px;
-        }
-        /* Kalau layar cukup lebar, jadi 3 kolom */
-        @media (min-width: 800px) {
-            .math-options { grid-template-columns: 1fr 1fr 1fr; }
-        }
+.screen {
 
-        .math-btn {
-            background: #333;
-            border: 1px solid #555;
-            color: white;
-            padding: 1.5vmin;
-            font-size: 2vmin;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .math-btn:active { background: #fff; color: #000; }
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 
-        /* Notifikasi */
-        .feedback-overlay {
-            position: absolute;
-            top: 40%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 5vmin;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s;
-            text-shadow: 2px 2px 0 #000;
-            white-space: nowrap;
-            z-index: 30;
-        }
+background: rgba(0,0,0,0.85); z-index: 100;
 
-        /* Countdown Overlay */
-        #countdown-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none;
-            z-index: 50;
-            background: rgba(0,0,0,0.3);
-        }
-        
-        .countdown-text {
-            font-size: 20vmin;
-            font-weight: bold;
-            color: #fff;
-            animation: zoomPop 0.8s ease-out;
-            text-shadow: 0 0 20px currentColor;
-        }
+display: flex; flex-direction: column; justify-content: center; align-items: center;
 
-        @keyframes zoomPop {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0; }
-        }
+transition: opacity 0.5s; backdrop-filter: blur(5px);
 
-        /* GAME OVER */
-        #game-over { background: rgba(0,0,0,0.95); }
-        #score-board { margin: 20px 0; width: 80%; max-width: 600px; }
-        .score-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
+}
 
-    </style>
+.hide { display: none !important; }
+
+
+h1 { color: #00eaff; font-size: 4vmin; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
+
+h2 { color: #fff; font-size: 2.5vmin; margin-bottom: 30px; }
+
+p { color: #ccc; max-width: 600px; text-align: center; font-size: 1.5vmin; line-height: 1.5; margin-bottom: 20px;}
+
+
+.btn-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+
+.action-btn {
+
+padding: 1.5vmin 4vmin; font-size: 2vmin;
+
+background: rgba(0, 234, 255, 0.1); color: #00eaff;
+
+border: 2px solid #00eaff; border-radius: 10px;
+
+font-family: 'Orbitron', sans-serif; font-weight: bold;
+
+cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+
+}
+
+.action-btn:hover, .action-btn.active {
+
+background: #00eaff; color: #000; box-shadow: 0 0 20px #00eaff; transform: scale(1.05);
+
+}
+
+
+.level-card {
+
+background: #222; border: 1px solid #444; padding: 20px; margin: 10px;
+
+border-radius: 10px; width: 200px; text-align: center; cursor: pointer;
+
+opacity: 0.5; pointer-events: none;
+
+}
+
+.level-card.unlocked { opacity: 1; pointer-events: auto; border-color: #00eaff; }
+
+.level-card:hover { background: #333; transform: translateY(-5px); border-color: #fff; }
+
+
+/* IN-GAME UI */
+
+#game-ui {
+
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+
+pointer-events: none; display: grid;
+
+}
+
+.grid-1 { grid-template-columns: 1fr; }
+
+.grid-2 { grid-template-columns: 1fr 1fr; }
+
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+
+.player-panel {
+
+position: relative; border-right: 2px solid rgba(255,255,255,0.2);
+
+box-sizing: border-box; pointer-events: none; overflow: hidden;
+
+display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;
+
+}
+
+.player-panel:last-child { border-right: none; }
+
+
+.p-color-bar { position: absolute; top: 0; left: 0; width: 100%; height: 5px; }
+
+
+.hud-top {
+
+position: absolute; top: 15px; left: 10px; right: 10px;
+
+display: flex; justify-content: space-between; align-items: flex-start;
+
+}
+
+
+.hud-info-box {
+
+background: rgba(0,0,0,0.6); padding: 5px 10px;
+
+border-radius: 5px; font-size: 1.5vmin; text-align: left;
+
+border: 1px solid rgba(255,255,255,0.1);
+
+}
+
+
+.speed-box { text-align: right; font-size: 2vmin; color: #fff; text-shadow: 0 0 5px currentColor; }
+
+.timer-display { font-family: monospace; font-size: 1.8vmin; color: #ffd700; margin-top: 5px; }
+
+
+.quit-btn {
+
+pointer-events: auto;
+
+background: rgba(255, 0, 0, 0.7);
+
+color: white;
+
+border: 1px solid red;
+
+border-radius: 5px;
+
+padding: 5px 10px;
+
+font-size: 1.5vmin;
+
+cursor: pointer;
+
+margin-left: 10px;
+
+font-family: 'Orbitron', sans-serif;
+
+}
+
+.quit-btn:hover { background: red; }
+
+
+.minimap-container {
+
+position: relative; width: 10px; height: 100px;
+
+background: rgba(255,255,255,0.1); border: 1px solid #555;
+
+border-radius: 5px; margin-left: 10px;
+
+}
+
+.minimap-marker {
+
+position: absolute; left: -3px; width: 16px; height: 4px;
+
+background: red; transition: bottom 0.2s linear; box-shadow: 0 0 2px black;
+
+}
+
+
+.math-box {
+
+pointer-events: auto; background: rgba(0, 0, 0, 0.85);
+
+border: 1px solid #fff; border-radius: 10px; padding: 10px;
+
+text-align: center; width: 90%; margin: 0 auto 20px auto;
+
+align-self: center; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+
+}
+
+.math-question { font-size: 3vmin; margin-bottom: 10px; color: #fff; }
+
+.math-options { display: grid; grid-template-columns: 1fr; gap: 5px; }
+
+@media (min-width: 800px) { .math-options { grid-template-columns: 1fr 1fr 1fr; } }
+
+
+.math-btn {
+
+background: #333; border: 1px solid #555; color: white;
+
+padding: 1.5vmin; font-size: 2vmin; font-family: 'Orbitron', sans-serif;
+
+cursor: pointer; border-radius: 5px; transition: background 0.1s;
+
+}
+
+.math-btn:hover { background: #444; border-color: #888; }
+
+.math-btn:active { background: #fff; color: #000; }
+
+
+.feedback-overlay {
+
+position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+
+font-size: 5vmin; font-weight: bold; opacity: 0; transition: opacity 0.3s;
+
+text-shadow: 2px 2px 0 #000; white-space: nowrap; z-index: 30;
+
+}
+
+
+.lap-popup {
+
+position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0);
+
+font-size: 8vmin; font-weight: bold; color: #ffd700;
+
+text-shadow: 0 0 20px #ffaa00, 2px 2px 5px black;
+
+transition: transform 0.5s, opacity 0.5s; opacity: 0; z-index: 50; pointer-events: none; white-space: nowrap;
+
+}
+
+.lap-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+
+/* Finish Text Individual */
+
+.finish-text {
+
+position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+
+font-size: 8vmin; font-weight: bold; color: #00eaff;
+
+text-shadow: 0 0 20px #00eaff, 2px 2px 5px black;
+
+display: none; z-index: 60;
+
+}
+
+
+#countdown-layer {
+
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+
+display: flex; justify-content: center; align-items: center; pointer-events: none;
+
+z-index: 50; background: rgba(0,0,0,0.3);
+
+}
+
+.countdown-text {
+
+font-size: 20vmin; font-weight: bold; color: #fff;
+
+animation: zoomPop 0.8s ease-out; text-shadow: 0 0 20px currentColor;
+
+}
+
+@keyframes zoomPop {
+
+0% { transform: scale(0.5); opacity: 0; }
+
+50% { transform: scale(1.2); opacity: 1; }
+
+100% { transform: scale(1); opacity: 0; }
+
+}
+
+
+#game-over { background: rgba(0,0,0,0.95); }
+
+#score-board { margin: 20px 0; width: 90%; max-width: 800px; }
+
+.score-row { 
+
+display: grid; grid-template-columns: 1fr 1fr 1fr; 
+
+padding: 10px; border-bottom: 1px solid #333; 
+
+font-size: 2vmin;
+
+}
+
+.score-header { font-weight: bold; color: #00eaff; border-bottom: 2px solid #00eaff; }
+
+</style>
+
 </head>
+
 <body>
 
-    <div id="game-container"></div>
-
-    <!-- MAIN MENU -->
-    <div id="main-menu" class="screen">
-        <h1>Math Moto Racing: Ultimate</h1>
-        <p>Game balap motor edukasi multiplayer (Split Screen Vertikal)</p>
-        <div class="btn-group">
-            <button class="action-btn" onclick="showStoryMenu()">Story Mode</button>
-            <button class="action-btn" onclick="showVersusMenu()">Versus Mode (2-4 Player)</button>
-        </div>
-    </div>
-
-    <!-- STORY MODE SELECT -->
-    <div id="story-menu" class="screen hide">
-        <h1>Story Mode</h1>
-        <h2>Pilih Level</h2>
-        <div id="level-container" class="btn-group"></div>
-        <button class="action-btn" style="margin-top: 30px;" onclick="goToMainMenu()">Kembali</button>
-    </div>
-
-    <!-- VERSUS SETUP -->
-    <div id="versus-menu" class="screen hide">
-        <h1>Versus Mode</h1>
-        <p>Atur jumlah pemain (Layar Split Vertikal)</p>
-        
-        <div style="margin-bottom: 20px;">
-            <h2>Jumlah Pemain</h2>
-            <div class="btn-group" id="player-select">
-                <button class="action-btn" onclick="setPlayers(2)">2 Player</button>
-                <button class="action-btn" onclick="setPlayers(3)">3 Player</button>
-                <button class="action-btn" onclick="setPlayers(4)">4 Player</button>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-            <h2>Jumlah Lap</h2>
-            <div class="btn-group" id="lap-select">
-                <button class="action-btn" onclick="setLaps(1)">1 Lap</button>
-                <button class="action-btn" onclick="setLaps(3)">3 Lap</button>
-                <button class="action-btn" onclick="setLaps(5)">5 Lap</button>
-            </div>
-        </div>
-
-        <button class="action-btn" style="margin-top: 20px; background: #00eaff; color: #000;" onclick="startVersus()">MULAI BALAPAN</button>
-        <button class="action-btn" style="margin-top: 10px;" onclick="goToMainMenu()">Kembali</button>
-    </div>
-
-    <!-- IN-GAME UI CONTAINER -->
-    <div id="game-ui" class="hide">
-        <!-- Player Panels injected here -->
-    </div>
-
-    <!-- COUNTDOWN LAYER -->
-    <div id="countdown-layer" class="hide"></div>
-
-    <!-- GAME OVER -->
-    <div id="game-over" class="screen hide">
-        <h1>BALAPAN SELESAI!</h1>
-        <h2 id="winner-text">Pemenang: Player 1</h2>
-        <div id="score-board"></div>
-        <button class="action-btn" onclick="goToMainMenu()">Menu Utama</button>
-    </div>
-
-    <!-- Import Three.js -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-            }
-        }
-    </script>
-
-    <script type="module">
-        import * as THREE from 'three';
-
-        // --- KONFIGURASI GLOBAL ---
-        const COLORS = [0x00eaff, 0xff3333, 0x00ff66, 0xffaa00]; // Biru, Merah, Hijau, Kuning
-        const ROAD_LENGTH = 1000;
-        const LAP_DISTANCE = 3000;
-        
-        const STORY_LEVELS = [
-            { id: 1, name: "Tutorial Track", laps: 1, aiSpeed: 0.6, locked: false },
-            { id: 2, name: "Winding Hills", laps: 2, aiSpeed: 0.9, locked: true },
-            { id: 3, name: "Neon Highway", laps: 3, aiSpeed: 1.2, locked: true },
-            { id: 4, name: "Cyber Circuit", laps: 4, aiSpeed: 1.5, locked: true }
-        ];
-
-        let scene, renderer;
-        let roads = [];
-        let players = [];
-        let gameActive = false;
-        let isCountingDown = false;
-        let currentMode = 'STORY'; 
-        let setupData = { playerCount: 1, laps: 2 };
-        let raceStartTime = null; // Waktu mulai balapan
-        
-        // --- HELPER FUNGSI WAKTU ---
-        function formatTime(ms) {
-            if (!ms) return "--:--.--";
-            let min = Math.floor(ms / 60000);
-            let sec = Math.floor((ms % 60000) / 1000);
-            let centi = Math.floor((ms % 1000) / 10);
-            return `${min}:${sec.toString().padStart(2, '0')}.${centi.toString().padStart(2, '0')}`;
-        }
-
-        // --- ROAD CURVE LOGIC ---
-        // Menghitung offset X berdasarkan posisi Z untuk efek jalan berbelok
-        function getCurveOffset(z) {
-            // Kombinasi gelombang sinus untuk membuat belokan yang tidak monoton
-            const curve1 = Math.sin(z * 0.002) * 20; 
-            const curve2 = Math.cos(z * 0.005) * 10;
-            return curve1 + curve2;
-        }
-
-        // --- CLASS PLAYER ---
-        class Player {
-            constructor(id, color, isAI = false) {
-                this.id = id;
-                this.color = color;
-                this.isAI = isAI;
-                this.lap = 1;
-                this.distance = 0;
-                this.speed = 0;
-                this.maxSpeed = 2.0;
-                this.combo = 0;
-                this.finished = false;
-                this.finishTime = 0; // Waktu finish dalam ms
-                
-                // Base X position (posisi jalur relatif terhadap tengah jalan)
-                this.baseX = (id % 2 === 0 ? -1 : 1) * (1.5 + (Math.floor(id/2) * 1.2));
-                
-                this.mesh = createBike(color);
-                this.mesh.position.set(this.baseX, 0, 0);
-                
-                this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000); // Aspect akan diupdate di render
-                // Posisi kamera awal
-                this.camera.position.set(this.baseX, 3, 6);
-                this.camera.rotation.x = -0.2;
-
-                // Math Logic
-                this.correctIndex = 0;
-            }
-
-            update() {
-                if (this.finished || isCountingDown) return;
-
-                // AI Logic
-                if (this.isAI) {
-                    let targetSpeed = setupData.aiSpeed || 0.8;
-                    // Rubber banding: AI lebih cepat jika player jauh di depan
-                    let leadDistance = 0;
-                    players.forEach(p => { if(!p.isAI && p.distance > leadDistance) leadDistance = p.distance; });
-                    if (leadDistance > this.distance + 100) targetSpeed *= 1.2;
-                    
-                    this.speed = THREE.MathUtils.lerp(this.speed, targetSpeed, 0.05);
-                } else {
-                    // Friction
-                    if (this.speed > 0.5) this.speed -= 0.003;
-                }
-
-                // Move Forward (Z axis)
-                const moveStep = this.speed;
-                this.mesh.position.z -= moveStep;
-                this.distance += moveStep;
-
-                // Curve Logic: Update X position based on Z curve
-                // Kita tambahkan baseX ke offset kurva agar player tetap di jalurnya masing-masing mengikuti kurva
-                const curveX = getCurveOffset(this.mesh.position.z);
-                this.mesh.position.x = this.baseX + curveX;
-
-                // Rotasi motor mengikuti kurva (derivatif sederhana)
-                const nextCurveX = getCurveOffset(this.mesh.position.z - 2); // Cek sedikit ke depan
-                const angle = Math.atan2(this.mesh.position.x - (this.baseX + nextCurveX), 2);
-                this.mesh.rotation.y = -angle * 0.5; // Miringkan motor sedikit
-
-                // Camera Follow
-                // Kamera mengikuti posisi X motor tapi lebih "smooth" (lagging) biar enak dilihat
-                const targetCamX = this.mesh.position.x;
-                const targetCamZ = this.mesh.position.z + 6;
-                
-                this.camera.position.x += (targetCamX - this.camera.position.x) * 0.2; // Smooth X
-                this.camera.position.z = targetCamZ; // Hard lock Z distance
-                
-                // Miringkan kamera sedikit sesuai belokan
-                this.camera.rotation.z = -angle * 0.3;
-
-                // Lap Counter
-                if (this.distance >= LAP_DISTANCE * this.lap) {
-                    if (this.lap >= setupData.laps) {
-                        this.finishRace();
-                    } else {
-                        this.lap++;
-                        this.updateHUD(); 
-                    }
-                }
-                
-                this.updateHUDStats();
-            }
-
-            finishRace() {
-                this.finished = true;
-                this.speed = 0;
-                this.finishTime = Date.now() - raceStartTime; // Simpan waktu finish
-                checkAllFinished();
-            }
-
-            generateMath() {
-                if (this.isAI) return; 
-
-                const level = Math.floor(this.combo / 3) + 1;
-                const max = level * 10;
-                const min = (level - 1) * 5;
-                const a = Math.floor(Math.random() * (max - min)) + min + 1;
-                const b = Math.floor(Math.random() * (max - min)) + min + 1;
-                const ans = a + b;
-
-                let opts = [ans];
-                while(opts.length < 3) {
-                    let r = ans + Math.floor(Math.random() * 10) - 5;
-                    if(r > 0 && !opts.includes(r)) opts.push(r);
-                }
-                opts.sort(() => Math.random() - 0.5);
-                
-                this.correctIndex = opts.indexOf(ans);
-                
-                const panel = document.getElementById(`panel-p${this.id}`);
-                if(panel) {
-                    panel.querySelector('.math-question').innerText = `${a} + ${b} = ?`;
-                    const btns = panel.querySelectorAll('.math-btn');
-                    btns.forEach((btn, i) => {
-                        btn.innerText = opts[i];
-                        btn.onclick = () => this.answer(i);
-                    });
-                }
-            }
-
-            answer(idx) {
-                const feedback = document.getElementById(`fb-p${this.id}`);
-                
-                if (idx === this.correctIndex) {
-                    // BENAR
-                    this.combo++;
-                    this.speed = Math.min(this.speed + 0.5, 3.5); 
-                    
-                    feedback.innerText = "NICE!";
-                    feedback.style.color = "#00ff66";
-                } else {
-                    // SALAH
-                    this.combo = 0;
-                    this.speed = 0.5; 
-                    
-                    feedback.innerText = "RESET!";
-                    feedback.style.color = "#ff3333";
-                }
-
-                feedback.style.opacity = 1;
-                setTimeout(() => feedback.style.opacity = 0, 500);
-                this.generateMath();
-            }
-
-            updateHUD() {
-                const panel = document.getElementById(`panel-p${this.id}`);
-                if(panel) {
-                    panel.querySelector('.lap-info').innerText = `Lap: ${this.lap}/${setupData.laps}`;
-                }
-            }
-
-            updateHUDStats() {
-                const panel = document.getElementById(`panel-p${this.id}`);
-                if(panel && !this.isAI) {
-                    // Update Speed
-                    const speedVal = Math.floor(this.speed * 100);
-                    panel.querySelector('.speed-text').innerText = `${speedVal} km/h`;
-
-                    // Update Timer
-                    if (raceStartTime && !this.finished) {
-                        const curTime = Date.now() - raceStartTime;
-                        panel.querySelector('.timer-display').innerText = formatTime(curTime);
-                    } else if (this.finished) {
-                         panel.querySelector('.timer-display').innerText = formatTime(this.finishTime);
-                    }
-
-                    // Update Minimap Player Marker
-                    // Kita perlu mengupdate posisi SEMUA marker di minimap milik player ini
-                    // Tapi di sini kita cukup update posisi data, nanti render loop yg handle? 
-                    // Lebih mudah update DOM langsung di sini.
-                    
-                    // Cari total distance
-                    const totalDist = LAP_DISTANCE * setupData.laps;
-                    
-                    // Update posisi sendiri
-                    const myPct = Math.min((this.distance / totalDist) * 100, 100);
-                    const myMarker = document.getElementById(`marker-p${this.id}-in-p${this.id}`);
-                    if(myMarker) myMarker.style.bottom = `${myPct}%`;
-
-                    // Update posisi musuh di minimap SAYA
-                    players.forEach(enemy => {
-                        if(enemy.id !== this.id) {
-                            const enemyPct = Math.min((enemy.distance / totalDist) * 100, 100);
-                            const enemyMarker = document.getElementById(`marker-p${enemy.id}-in-p${this.id}`);
-                            if(enemyMarker) enemyMarker.style.bottom = `${enemyPct}%`;
-                        }
-                    });
-                }
-            }
-        }
-
-        // --- SCENE & ASSETS ---
-        function initScene() {
-            const container = document.getElementById('game-container');
-            container.innerHTML = '';
-
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x050510);
-            scene.fog = new THREE.Fog(0x050510, 20, 150);
-
-            const amb = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(amb);
-            const dir = new THREE.DirectionalLight(0xffffff, 1);
-            dir.position.set(10, 20, 10);
-            scene.add(dir);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setScissorTest(true); 
-            container.appendChild(renderer.domElement);
-
-            // Create Roads - Menambahkan segmen ke-3 agar aman dari blank
-            createRoadSegment(-ROAD_LENGTH/2);
-            createRoadSegment(-ROAD_LENGTH * 1.5);
-            createRoadSegment(-ROAD_LENGTH * 2.5);
-        }
-
-        function createRoadSegment(zPos) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512; canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#222'; ctx.fillRect(0,0,512,512); 
-            ctx.fillStyle = '#fff'; ctx.fillRect(0,0,10,512); ctx.fillRect(502,0,10,512); 
-            ctx.fillStyle = '#ffaa00'; ctx.fillRect(251,0,10,256); 
-            
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(1, 40); 
-
-            // Gunakan segmen plane yang banyak agar bisa dibelokkan? 
-            // Tidak, kita geser satu mesh utuh. Visual curve "smooth" hanya akan terlihat jika plane punya banyak segmen vertices.
-            // Untuk performa di single file, kita geser mesh besar saja.
-            const geo = new THREE.PlaneGeometry(60, ROAD_LENGTH, 20, 100); // WidthSegments, HeightSegments (banyakin biar smooth)
-            
-            // Kita akan modifikasi vertices di update loop jika mau curve real geometry,
-            // tapi menggeser posisi X object juga cukup oke. 
-            // Supaya jalan terlihat melengkung halus, kita perlu Custom Shader atau update vertices tiap frame.
-            // Mari kita pakai cara update vertices sederhana di Init saja tidak cukup karena jalan bergerak.
-            // Cara termudah: Mesh lurus, tapi kita mainkan posisi X nya tiap frame di update loop (lihat animate).
-            
-            const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8, side: THREE.DoubleSide });
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.rotation.x = -Math.PI/2;
-            mesh.position.z = zPos;
-            
-            // FIX: Matikan frustum culling agar jalan tidak hilang (flicker) saat berbelok di ujung layar
-            mesh.frustumCulled = false;
-
-            scene.add(mesh);
-            roads.push(mesh);
-        }
-
-        function createBike(color) {
-            const g = new THREE.Group();
-            const bGeo = new THREE.BoxGeometry(0.8, 0.5, 1.8);
-            const bMat = new THREE.MeshPhongMaterial({ color: color });
-            const body = new THREE.Mesh(bGeo, bMat);
-            body.position.y = 0.5;
-            g.add(body);
-
-            const wGeo = new THREE.TorusGeometry(0.35, 0.15, 8, 16);
-            const wMat = new THREE.MeshStandardMaterial({ color: 0x111, emissive: color, emissiveIntensity: 0.5 });
-            const w1 = new THREE.Mesh(wGeo, wMat); w1.rotation.y = Math.PI/2; w1.position.set(0,0.35,-0.9);
-            const w2 = new THREE.Mesh(wGeo, wMat); w2.rotation.y = Math.PI/2; w2.position.set(0,0.35,0.9);
-            g.add(w1); g.add(w2);
-            return g;
-        }
-
-        // --- GAME LOOP ---
-        function animate() {
-            if (!gameActive) return;
-            requestAnimationFrame(animate);
-
-            // Cari posisi Z pemain paling belakang (nilainya paling besar, karena maju ke arah negatif)
-            // Start 0, finish -3000. Jadi -100 > -2000. Yang terbesar adalah yang paling belakang.
-            let trailingZ = -Infinity;
-            players.forEach(p => { 
-                if(p.mesh.position.z > trailingZ) trailingZ = p.mesh.position.z; 
-            });
-
-            // 1. Update Roads Curve Visuals
-            roads.forEach(r => {
-                // Untuk efek curve yang lebih halus pada geometri plane yang besar:
-                const positionAttribute = r.geometry.attributes.position;
-                
-                // Simple vertex displacement visual only (posisi X mesh digeser)
-                r.position.x = getCurveOffset(r.position.z);
-
-                // Infinite loop logic (Recycle Road)
-                // Cek apakah jalan sudah jauh di belakang pemain paling lambat
-                // trailingZ adalah misal -100. r.position.z misal 500 (di belakang).
-                // Karena kita bergerak ke negatif, "belakang" artinya nilai Z lebih besar (positif) dari pemain.
-                // Road center Z > trailingZ + safety_margin
-                
-                if (r.position.z > (trailingZ + ROAD_LENGTH/2 + 200)) { 
-                     // Pindahkan ke depan (cari nilai Z terkecil/paling depan)
-                     let frontZ = Infinity;
-                     roads.forEach(road => { if(road.position.z < frontZ) frontZ = road.position.z; });
-                     r.position.z = frontZ - ROAD_LENGTH;
-                }
-            });
-
-            // 2. Update Players
-            players.forEach(p => p.update());
-
-            // 3. Render Views
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            renderer.setSize(width, height);
-
-            let n = players.length;
-            if (currentMode === 'STORY') n = 1;
-
-            // VIEWPORT LOGIC: VERTICAL COLUMNS
-            // w = width / n
-            const stripWidth = width / n;
-
-            players.forEach((p, i) => {
-                if (i >= n) return;
-
-                const left = i * stripWidth;
-                const bottom = 0;
-                
-                // Set area render
-                renderer.setViewport(left, bottom, stripWidth, height);
-                renderer.setScissor(left, bottom, stripWidth, height);
-                
-                // Update aspect ratio kamera agar tidak gepeng
-                p.camera.aspect = stripWidth / height;
-                p.camera.updateProjectionMatrix();
-
-                renderer.render(scene, p.camera);
-            });
-        }
-
-        // --- COUNTDOWN SYSTEM ---
-        function startCountdown() {
-            isCountingDown = true;
-            raceStartTime = null; // Reset Timer
-            const layer = document.getElementById('countdown-layer');
-            layer.classList.remove('hide');
-            layer.innerHTML = '';
-
-            let count = 3;
-            
-            function showNumber() {
-                if (count > 0) {
-                    layer.innerHTML = `<div class="countdown-text" style="color:red">${count}</div>`;
-                    count--;
-                    setTimeout(showNumber, 1000);
-                } else if (count === 0) {
-                    layer.innerHTML = `<div class="countdown-text" style="color:#00ff66">GO!</div>`;
-                    raceStartTime = Date.now(); // Start Timer
-                    count--;
-                    setTimeout(showNumber, 1000);
-                } else {
-                    layer.classList.add('hide');
-                    isCountingDown = false;
-                }
-            }
-            showNumber();
-        }
-
-        function checkAllFinished() {
-            const humans = players.filter(p => !p.isAI);
-            if (humans.every(p => p.finished)) {
-                setTimeout(showGameOver, 2000);
-            }
-        }
-
-        // --- UI & SETUP ---
-
-        window.startStoryLevel = function(levelId) {
-            const lvl = STORY_LEVELS.find(l => l.id === levelId);
-            if (lvl.locked) return;
-            currentMode = 'STORY';
-            setupData = { playerCount: 1, laps: lvl.laps, aiSpeed: lvl.aiSpeed };
-            startGame();
-        }
-
-        window.startVersus = function() {
-            currentMode = 'VERSUS';
-            startGame();
-        }
-
-        function startGame() {
-            document.querySelectorAll('.screen').forEach(el => el.classList.add('hide'));
-            document.getElementById('game-ui').classList.remove('hide');
-            
-            initScene();
-            players = [];
-            
-            const uiContainer = document.getElementById('game-ui');
-            uiContainer.innerHTML = '';
-            
-            // Set Grid Class (Selalu Vertikal)
-            uiContainer.className = '';
-            const pCount = (currentMode === 'STORY') ? 1 : setupData.playerCount;
-            uiContainer.classList.add(`grid-${pCount}`);
-
-            for (let i = 0; i < pCount; i++) {
-                // Player Logic
-                let p = new Player(i, COLORS[i]);
-                players.push(p);
-                scene.add(p.mesh);
-
-                // Create Minimap Markers HTML
-                let markersHTML = '';
-                // Add marker for self
-                markersHTML += `<div id="marker-p${i}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[i].toString(16)}; z-index:2; border:1px solid white;"></div>`;
-                // Add markers for others (initially at 0)
-                for(let j=0; j<pCount; j++) {
-                    if(j!==i) markersHTML += `<div id="marker-p${j}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[j].toString(16)}; width:12px; left:-1px;"></div>`;
-                }
-                // If story mode, add AI marker
-                if(currentMode === 'STORY') {
-                    markersHTML += `<div id="marker-p1-in-p0" class="minimap-marker" style="background:#ff3333; width:12px; left:-1px;"></div>`;
-                }
-
-                // Create UI Panel
-                const panel = document.createElement('div');
-                panel.className = `player-panel`;
-                panel.id = `panel-p${i}`;
-                panel.innerHTML = `
-                    <div class="p-color-bar" style="background:${'#'+COLORS[i].toString(16)}"></div>
-                    
-                    <div class="hud-top">
-                        <div class="hud-info-box">
-                            <div style="color:${'#'+COLORS[i].toString(16)}; font-weight:bold;">P${i+1}</div>
-                            <div class="lap-info" style="color:#aaa;">Lap 1/${setupData.laps}</div>
-                            <div class="timer-display">0:00.00</div>
-                        </div>
-                        <div style="display:flex; align-items:center;">
-                            <div class="speed-box hud-info-box">
-                                <span class="speed-text">0 km/h</span>
-                            </div>
-                            <div class="minimap-container">
-                                ${markersHTML}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="feedback-overlay" id="fb-p${i}">NICE!</div>
-                    
-                    <div class="math-box">
-                        <div class="math-question">Ready?</div>
-                        <div class="math-options">
-                            <button class="math-btn">A</button>
-                            <button class="math-btn">B</button>
-                            <button class="math-btn">C</button>
-                        </div>
-                    </div>
-                `;
-                uiContainer.appendChild(panel);
-                p.generateMath();
-            }
-
-            // AI for Story Mode
-            if (currentMode === 'STORY') {
-                let ai = new Player(1, 0xff3333, true);
-                players.push(ai);
-                scene.add(ai.mesh);
-            }
-
-            gameActive = true;
-            animate();
-            startCountdown();
-        }
-
-        function showGameOver() {
-            gameActive = false;
-            document.getElementById('game-ui').classList.add('hide');
-            const goScreen = document.getElementById('game-over');
-            goScreen.classList.remove('hide');
-            
-            let sorted = [...players].sort((a,b) => b.distance - a.distance);
-            let winner = sorted[0];
-
-            let wText = winner.isAI ? "AI MENANG!" : `PLAYER ${winner.id + 1} MENANG!`;
-            if (currentMode === 'STORY' && !winner.isAI) {
-                unlockNextLevel();
-                wText += " <br><span style='font-size:20px; color:#aaa'>(Level Berikutnya Terbuka)</span>";
-            }
-            
-            document.getElementById('winner-text').innerHTML = wText;
-            document.getElementById('winner-text').style.color = '#' + winner.color.toString(16);
-            
-            // Scoreboard
-            const sb = document.getElementById('score-board');
-            sb.innerHTML = '';
-            sorted.forEach((p, idx) => {
-                if(currentMode === 'STORY' && idx > 1) return; // Hide excess logic
-                let name = p.isAI ? "CPU Opponent" : `Player ${p.id+1}`;
-                let timeStr = formatTime(p.finishTime);
-                if (!p.finished && p.isAI) timeStr = "DNF"; // Jika AI kalah jauh
-
-                let row = document.createElement('div');
-                row.className = 'score-row';
-                row.innerHTML = `<span style="color:${'#'+p.color.toString(16)}">#${idx+1} ${name}</span> <span>${timeStr}</span>`;
-                sb.appendChild(row);
-            });
-        }
-
-        function unlockNextLevel() {
-            let currentLvlObj = STORY_LEVELS.find(l => l.laps === setupData.laps && l.aiSpeed === setupData.aiSpeed);
-            if (currentLvlObj) {
-                let nextIdx = STORY_LEVELS.indexOf(currentLvlObj) + 1;
-                if (nextIdx < STORY_LEVELS.length) STORY_LEVELS[nextIdx].locked = false;
-            }
-        }
-
-        // --- MENU HELPERS ---
-        window.goToMainMenu = () => { gameActive = false; toggleScreen('main-menu'); };
-        window.showStoryMenu = () => {
-            toggleScreen('story-menu');
-            const cont = document.getElementById('level-container');
-            cont.innerHTML = '';
-            STORY_LEVELS.forEach(lvl => {
-                const div = document.createElement('div');
-                div.className = `level-card ${lvl.locked ? '' : 'unlocked'}`;
-                div.innerHTML = `<h3>${lvl.name}</h3><p>${lvl.laps} Laps</p>`;
-                if(!lvl.locked) div.onclick = () => startStoryLevel(lvl.id);
-                cont.appendChild(div);
-            });
-        };
-        window.showVersusMenu = () => { toggleScreen('versus-menu'); setPlayers(2); setLaps(3); };
-        window.setPlayers = (n) => { setupData.playerCount = n; updateBtnGroup('player-select', n + ' Player'); };
-        window.setLaps = (n) => { setupData.laps = n; updateBtnGroup('lap-select', n + ' Lap'); };
-
-        function toggleScreen(id) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.add('hide'));
-            document.getElementById(id).classList.remove('hide');
-        }
-        function updateBtnGroup(id, txt) {
-            document.getElementById(id).querySelectorAll('button').forEach(b => {
-                if(b.innerText.includes(txt)) b.classList.add('active'); else b.classList.remove('active');
-            });
-        }
-
-    </script>
+<div id="game-container"></div>
+
+
+<!-- MAIN MENU -->
+
+<div id="main-menu" class="screen">
+
+<h1>Math Moto Racing 3D</h1>
+
+<p>Championship Edition</p>
+
+<div class="btn-group">
+
+<button class="action-btn" onclick="showStoryMenu()">Story Mode</button>
+
+<button class="action-btn" onclick="showVersusMenu()">Versus Mode</button>
+
+</div>
+
+</div>
+
+
+<!-- STORY MODE SELECT -->
+
+<div id="story-menu" class="screen hide">
+
+<h1>Story Mode</h1>
+
+<h2>Pilih Level</h2>
+
+<div id="story-points" style="color: #ffd700; margin-bottom: 20px;">Total Poin Musim: 0</div>
+
+<div id="level-container" class="btn-group"></div>
+
+<button class="action-btn" style="margin-top: 30px;" onclick="goToMainMenu()">Kembali</button>
+
+</div>
+
+
+<!-- VERSUS SETUP -->
+
+<div id="versus-menu" class="screen hide">
+
+<h1>Versus Mode</h1>
+
+<p>Setup Multiplayer</p>
+
+<div style="margin-bottom: 20px;">
+
+<h2>Pemain</h2>
+
+<div class="btn-group" id="player-select">
+
+<button class="action-btn" onclick="setPlayers(2)">2 Player</button>
+
+<button class="action-btn" onclick="setPlayers(3)">3 Player</button>
+
+<button class="action-btn" onclick="setPlayers(4)">4 Player</button>
+
+</div>
+
+</div>
+
+<div style="margin-bottom: 20px;">
+
+<h2>Putaran (Lap)</h2>
+
+<div class="btn-group" id="lap-select">
+
+<button class="action-btn" onclick="setLaps(1)">1 Lap</button>
+
+<button class="action-btn" onclick="setLaps(3)">3 Lap</button>
+
+<button class="action-btn" onclick="setLaps(5)">5 Lap</button>
+
+</div>
+
+</div>
+
+<button class="action-btn" style="margin-top: 20px; background: #00eaff; color: #000;" onclick="startVersus()">MULAI BALAPAN</button>
+
+<button class="action-btn" style="margin-top: 10px;" onclick="goToMainMenu()">Kembali</button>
+
+</div>
+
+
+<!-- IN-GAME UI -->
+
+<div id="game-ui" class="hide"></div>
+
+<div id="countdown-layer" class="hide"></div>
+
+
+<!-- GAME OVER -->
+
+<div id="game-over" class="screen hide">
+
+<h1>HASIL BALAPAN</h1>
+
+<div id="score-board"></div>
+
+<button class="action-btn" onclick="goToMainMenu()">Menu Utama</button>
+
+</div>
+
+
+<!-- Import Three.js -->
+
+<script type="importmap">
+
+{
+
+"imports": {
+
+"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+
+}
+
+}
+
+</script>
+
+
+<script type="module">
+
+import * as THREE from 'three';
+
+
+// --- ASSET CONFIG ---
+
+const ASSETS = {
+
+body: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/bikebody.png',
+
+road: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/road.png',
+
+sky: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/skybox.png',
+
+tire: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/tire.png'
+
+};
+
+
+const COLORS = [0x00eaff, 0xff3333, 0x00ff66, 0xffaa00, 0xaa00ff, 0x00ffff];
+
+const ROAD_LENGTH = 1000;
+
+const LAP_DISTANCE = 3000;
+
+const POINTS_SYSTEM = [10, 8, 6, 4, 2, 0]; // Juara 1 dpt 10, dst
+
+const STORY_LEVELS = [
+
+{ id: 1, name: "Tutorial Track", laps: 1, aiSpeed: 0.6, locked: false },
+
+{ id: 2, name: "Speedway", laps: 2, aiSpeed: 0.9, locked: true },
+
+{ id: 3, name: "Hyper Lane", laps: 3, aiSpeed: 1.2, locked: true },
+
+{ id: 4, name: "Champion Road", laps: 4, aiSpeed: 1.5, locked: true }
+
+];
+
+
+let scene, renderer, textureLoader;
+
+let texBody, texRoad, texSky, texTire; 
+
+let roads = [];
+
+let players = [];
+
+let finishOrder = []; // Menyimpan urutan siapa yang finish duluan
+
+let globalSeasonPoints = 0; // Poin akumulasi Story Mode
+
+
+let gameActive = false;
+
+let isCountingDown = false;
+
+let currentMode = 'STORY'; 
+
+let setupData = { playerCount: 1, laps: 2 };
+
+let raceStartTime = null;
+
+
+// --- HELPER UTILS ---
+
+function formatTime(ms) {
+
+if (!ms) return "--:--.--";
+
+let min = Math.floor(ms / 60000);
+
+let sec = Math.floor((ms % 60000) / 1000);
+
+let centi = Math.floor((ms % 1000) / 10);
+
+return `${min}:${sec.toString().padStart(2, '0')}.${centi.toString().padStart(2, '0')}`;
+
+}
+
+
+// --- PLAYER CLASS ---
+
+class Player {
+
+constructor(id, color, isAI = false, startOffset = 0) {
+
+this.id = id;
+
+this.color = color;
+
+this.isAI = isAI;
+
+this.lap = 1;
+
+this.distance = 0;
+
+this.speed = 0;
+
+this.maxSpeed = 2.0;
+
+this.combo = 0;
+
+this.finished = false;
+
+this.finishTime = 0;
+
+this.hasQuit = false;
+
+// Distribusi posisi start berdasarkan jumlah pemain
+
+this.baseX = startOffset * 2.5; 
+
+this.mesh = createBike(color);
+
+this.mesh.position.set(this.baseX, 0, 0);
+
+this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
+
+this.camera.position.set(this.baseX, 3, 7);
+
+this.camera.rotation.x = -0.25;
+
+
+this.correctIndex = 0;
+
+}
+
+
+update() {
+
+if (this.hasQuit) return;
+
+// Jika sudah finish, motor melambat sampai berhenti
+
+if (this.finished) {
+
+if (this.speed > 0) {
+
+this.speed -= 0.02;
+
+this.mesh.position.z -= this.speed;
+
+// Tetap update kamera
+
+this.camera.position.z = this.mesh.position.z + 7;
+
+}
+
+return; 
+
+}
+
+
+if (isCountingDown) return;
+
+
+if (this.isAI) {
+
+let targetSpeed = setupData.aiSpeed || 0.8;
+
+// Variasi kecepatan AI biar tidak barengan terus
+
+targetSpeed *= (0.9 + (this.id % 3) * 0.05); 
+
+// Rubber banding (biar ga ketinggalan jauh)
+
+let leadDistance = 0;
+
+players.forEach(p => { if(!p.isAI && p.distance > leadDistance) leadDistance = p.distance; });
+
+if (leadDistance > this.distance + 150) targetSpeed *= 1.3;
+
+this.speed = THREE.MathUtils.lerp(this.speed, targetSpeed, 0.05);
+
+} else {
+
+if (this.speed > 0.5) this.speed -= 0.003;
+
+}
+
+
+const moveStep = this.speed;
+
+this.mesh.position.z -= moveStep;
+
+this.distance += moveStep;
+
+
+this.mesh.position.x = this.baseX; 
+
+this.mesh.rotation.y = 0; 
+
+
+const targetCamZ = this.mesh.position.z + 7;
+
+this.camera.position.z = targetCamZ;
+
+this.camera.position.x = this.baseX; 
+
+this.camera.rotation.z = 0; 
+
+
+// Lap Check
+
+if (this.distance >= LAP_DISTANCE * this.lap) {
+
+if (this.lap >= setupData.laps) {
+
+this.finishRace();
+
+} else {
+
+this.lap++;
+
+this.showLapPopup();
+
+this.updateHUD(); 
+
+}
+
+}
+
+this.updateHUDStats();
+
+}
+
+
+quitRace() {
+
+if (this.finished || this.hasQuit) return;
+
+this.hasQuit = true;
+
+this.speed = 0;
+
+// Tampilkan status Quit di layar
+
+const panel = document.getElementById(`panel-p${this.id}`);
+
+if (panel) {
+
+const finishText = panel.querySelector('.finish-text');
+
+finishText.innerText = "GAVE UP";
+
+finishText.style.color = "red";
+
+finishText.style.display = "block";
+
+panel.querySelector('.math-box').style.display = 'none';
+
+}
+
+checkAllFinished();
+
+}
+
+
+finishRace() {
+
+this.finished = true;
+
+this.finishTime = Date.now() - raceStartTime;
+
+// Masukkan ke daftar finish order untuk ranking
+
+finishOrder.push(this);
+
+
+// Tampilkan Teks FINISH
+
+if (!this.isAI) {
+
+const panel = document.getElementById(`panel-p${this.id}`);
+
+if (panel) {
+
+panel.querySelector('.finish-text').style.display = "block";
+
+panel.querySelector('.math-box').style.display = 'none'; // Sembunyikan soal
+
+}
+
+}
+
+checkAllFinished();
+
+}
+
+
+showLapPopup() {
+
+if(this.isAI) return;
+
+const popup = document.getElementById(`lap-popup-p${this.id}`);
+
+if(popup) {
+
+popup.innerText = `LAP ${this.lap}`;
+
+popup.classList.add('show');
+
+setTimeout(() => { popup.classList.remove('show'); }, 1500);
+
+}
+
+}
+
+
+generateMath() {
+
+if (this.isAI || this.finished || this.hasQuit) return; 
+
+const level = Math.floor(this.combo / 3) + 1;
+
+const max = level * 10;
+
+const min = (level - 1) * 5;
+
+const a = Math.floor(Math.random() * (max - min)) + min + 1;
+
+const b = Math.floor(Math.random() * (max - min)) + min + 1;
+
+const ans = a + b;
+
+
+let opts = [ans];
+
+while(opts.length < 3) {
+
+let r = ans + Math.floor(Math.random() * 10) - 5;
+
+if(r > 0 && !opts.includes(r)) opts.push(r);
+
+}
+
+opts.sort(() => Math.random() - 0.5);
+
+this.correctIndex = opts.indexOf(ans);
+
+const panel = document.getElementById(`panel-p${this.id}`);
+
+if(panel) {
+
+panel.querySelector('.math-question').innerText = `${a} + ${b} = ?`;
+
+const btns = panel.querySelectorAll('.math-btn');
+
+btns.forEach((btn, i) => {
+
+btn.innerText = opts[i];
+
+btn.onclick = () => this.answer(i);
+
+});
+
+}
+
+}
+
+
+answer(idx) {
+
+if(this.finished || this.hasQuit) return;
+
+const feedback = document.getElementById(`fb-p${this.id}`);
+
+if (idx === this.correctIndex) {
+
+this.combo++;
+
+this.speed = Math.min(this.speed + 0.6, 3.5); 
+
+feedback.innerText = "NICE!"; feedback.style.color = "#00ff66";
+
+} else {
+
+this.combo = 0; this.speed = 0.5; 
+
+feedback.innerText = "RESET!"; feedback.style.color = "#ff3333";
+
+}
+
+feedback.style.opacity = 1;
+
+setTimeout(() => feedback.style.opacity = 0, 500);
+
+this.generateMath();
+
+}
+
+
+updateHUD() {
+
+const panel = document.getElementById(`panel-p${this.id}`);
+
+if(panel) panel.querySelector('.lap-info').innerText = `Lap: ${this.lap}/${setupData.laps}`;
+
+}
+
+
+updateHUDStats() {
+
+const panel = document.getElementById(`panel-p${this.id}`);
+
+if(panel && !this.isAI) {
+
+const speedVal = Math.floor(this.speed * 100);
+
+panel.querySelector('.speed-text').innerText = `${speedVal} km/h`;
+
+
+if (raceStartTime && !this.finished && !this.hasQuit) {
+
+panel.querySelector('.timer-display').innerText = formatTime(Date.now() - raceStartTime);
+
+} else if (this.finished) {
+
+panel.querySelector('.timer-display').innerText = formatTime(this.finishTime);
+
+}
+
+
+const totalDist = LAP_DISTANCE * setupData.laps;
+
+players.forEach(enemy => {
+
+const enemyPct = Math.min((enemy.distance / totalDist) * 100, 100);
+
+const marker = document.getElementById(`marker-p${enemy.id}-in-p${this.id}`);
+
+if(marker) marker.style.bottom = `${enemyPct}%`;
+
+});
+
+}
+
+}
+
+}
+
+
+// --- 3D SETUP ---
+
+function initScene() {
+
+const container = document.getElementById('game-container');
+
+container.innerHTML = '';
+
+
+scene = new THREE.Scene();
+
+textureLoader = new THREE.TextureLoader();
+
+texSky = textureLoader.load(ASSETS.sky, () => {
+
+texSky.mapping = THREE.EquirectangularReflectionMapping;
+
+scene.background = texSky;
+
+});
+
+scene.background = new THREE.Color(0x050510);
+
+texRoad = textureLoader.load(ASSETS.road);
+
+texRoad.wrapS = THREE.RepeatWrapping; texRoad.wrapT = THREE.RepeatWrapping;
+
+texRoad.repeat.set(1, 20); 
+
+texBody = textureLoader.load(ASSETS.body);
+
+texTire = textureLoader.load(ASSETS.tire);
+
+
+scene.fog = new THREE.Fog(0x1a1a2e, 20, 150);
+
+const amb = new THREE.AmbientLight(0xffffff, 0.8); scene.add(amb);
+
+const dir = new THREE.DirectionalLight(0xffffff, 1.5); dir.position.set(10, 20, 10); scene.add(dir);
+
+
+renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+renderer.setScissorTest(true); 
+
+container.appendChild(renderer.domElement);
+
+
+for(let i=0; i<10; i++) { createRoadSegment(-(ROAD_LENGTH/2) - (ROAD_LENGTH * i)); }
+
+}
+
+
+function createRoadSegment(zPos) {
+
+const geo = new THREE.PlaneGeometry(60, ROAD_LENGTH, 1, 1);
+
+const mat = new THREE.MeshStandardMaterial({ map: texRoad, roughness: 0.8, color: 0xaaaaaa });
+
+const mesh = new THREE.Mesh(geo, mat);
+
+mesh.rotation.x = -Math.PI/2; mesh.position.z = zPos; mesh.frustumCulled = false;
+
+scene.add(mesh); roads.push(mesh);
+
+}
+
+
+function createBike(color) {
+
+const g = new THREE.Group();
+
+const bGeo = new THREE.BoxGeometry(0.8, 0.6, 1.8);
+
+const bMat = new THREE.MeshStandardMaterial({ map: texBody, color: color, roughness: 0.4, metalness: 0.5 });
+
+const body = new THREE.Mesh(bGeo, bMat); body.position.y = 0.6; g.add(body);
+
+
+const wGeo = new THREE.BoxGeometry(0.7, 0.3, 0.5);
+
+const wMat = new THREE.MeshPhongMaterial({ color: 0x000000, opacity: 0.8, transparent: true });
+
+const wind = new THREE.Mesh(wGeo, wMat); wind.position.set(0, 1.0, -0.4); wind.rotation.x = -0.4; g.add(wind);
+
+
+const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.25, 32);
+
+const wheelMat = new THREE.MeshStandardMaterial({ map: texTire, color: 0xffffff, roughness: 0.8 });
+
+const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.rotation.z = Math.PI / 2; w1.position.set(0, 0.4, -1.0);
+
+const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.rotation.z = Math.PI / 2; w2.position.set(0, 0.4, 1.0);
+
+g.add(w1); g.add(w2);
+
+return g;
+
+}
+
+
+// --- GAME LOOP ---
+
+function animate() {
+
+if (!gameActive) return;
+
+requestAnimationFrame(animate);
+
+
+let trailingZ = -Infinity;
+
+players.forEach(p => { if(p.mesh.position.z > trailingZ) trailingZ = p.mesh.position.z; });
+
+
+roads.forEach(r => {
+
+if (r.position.z > (trailingZ + ROAD_LENGTH/2 + 200)) { 
+
+let frontZ = Infinity;
+
+roads.forEach(road => { if(road.position.z < frontZ) frontZ = road.position.z; });
+
+r.position.z = frontZ - ROAD_LENGTH;
+
+}
+
+});
+
+
+players.forEach(p => p.update());
+
+
+const width = window.innerWidth;
+
+const height = window.innerHeight;
+
+renderer.setSize(width, height);
+
+
+let n = players.length;
+
+if (currentMode === 'STORY') n = 1; // Story mode hanya render 1 layar
+
+
+const stripWidth = width / n;
+
+
+players.forEach((p, i) => {
+
+if (i >= n) return;
+
+const left = i * stripWidth;
+
+renderer.setViewport(left, 0, stripWidth, height);
+
+renderer.setScissor(left, 0, stripWidth, height);
+
+p.camera.aspect = stripWidth / height;
+
+p.camera.updateProjectionMatrix();
+
+renderer.render(scene, p.camera);
+
+});
+
+}
+
+
+// --- COUNTDOWN & STATE ---
+
+function startCountdown() {
+
+isCountingDown = true;
+
+raceStartTime = null;
+
+const layer = document.getElementById('countdown-layer');
+
+layer.classList.remove('hide');
+
+layer.innerHTML = '';
+
+let count = 3;
+
+function showNumber() {
+
+if (count > 0) {
+
+layer.innerHTML = `<div class="countdown-text" style="color:red">${count}</div>`;
+
+count--; setTimeout(showNumber, 1000);
+
+} else if (count === 0) {
+
+layer.innerHTML = `<div class="countdown-text" style="color:#00ff66">GO!</div>`;
+
+raceStartTime = Date.now();
+
+count--; setTimeout(showNumber, 1000);
+
+} else {
+
+layer.classList.add('hide');
+
+isCountingDown = false;
+
+}
+
+}
+
+showNumber();
+
+}
+
+
+// --- MODIFIED: CHECK FINISH CONDITION ---
+
+function checkAllFinished() {
+
+// Tunggu sampai SEMUA pemain (Human & AI) selesai atau Quit
+
+if (players.every(p => p.finished || p.hasQuit)) {
+
+// Beri sedikit delay sebelum muncul Game Over
+
+setTimeout(showGameOver, 2000);
+
+}
+
+}
+
+
+// --- MENU LOGIC ---
+
+window.startStoryLevel = function(levelId) {
+
+const lvl = STORY_LEVELS.find(l => l.id === levelId);
+
+if (lvl.locked) return;
+
+currentMode = 'STORY';
+
+setupData = { playerCount: 1, laps: lvl.laps, aiSpeed: lvl.aiSpeed };
+
+startGame();
+
+}
+
+window.startVersus = function() { currentMode = 'VERSUS'; startGame(); }
+
+
+window.quitGame = function(playerId) {
+
+if(players[playerId]) {
+
+players[playerId].quitRace();
+
+}
+
+}
+
+
+function startGame() {
+
+document.querySelectorAll('.screen').forEach(el => el.classList.add('hide'));
+
+document.getElementById('game-ui').classList.remove('hide');
+
+initScene();
+
+players = [];
+
+finishOrder = []; // Reset order
+
+const uiContainer = document.getElementById('game-ui');
+
+uiContainer.innerHTML = '';
+
+uiContainer.className = '';
+
+// Tentukan jumlah layar
+
+let uiCount = (currentMode === 'STORY') ? 1 : setupData.playerCount;
+
+// Tentukan total motor di jalan (Story: 1 Human + 4 AI = 5, Versus: setupData)
+
+let totalBikes = (currentMode === 'STORY') ? 5 : setupData.playerCount;
+
+uiContainer.classList.add(`grid-${uiCount}`);
+
+
+// Buat Pemain Manusia
+
+for (let i = 0; i < uiCount; i++) {
+
+// Hitung offset agar motor berada di tengah jalan secara rapi
+
+let startOffset = i - (totalBikes - 1) / 2;
+
+let p = new Player(i, COLORS[i], false, startOffset);
+
+players.push(p);
+
+scene.add(p.mesh);
+
+
+let markersHTML = `<div id="marker-p${i}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[i].toString(16)}; z-index:2; border:1px solid white;"></div>`;
+
+// Marker musuh (AI atau Human lain) akan diinject nanti
+
+// Tambahkan marker musuh awal
+
+for(let j=0; j<totalBikes; j++) {
+
+if(j!==i) markersHTML += `<div id="marker-p${j}-in-p${i}" class="minimap-marker" style="background: white; width:12px; left:-1px;"></div>`;
+
+}
+
+
+const panel = document.createElement('div');
+
+panel.className = `player-panel`;
+
+panel.id = `panel-p${i}`;
+
+panel.innerHTML = `
+
+<div class="p-color-bar" style="background:${'#'+COLORS[i].toString(16)}"></div>
+
+<div class="hud-top">
+
+<div class="hud-info-box">
+
+<div style="color:${'#'+COLORS[i].toString(16)}; font-weight:bold;">P${i+1}</div>
+
+<div class="lap-info" style="color:#aaa;">Lap 1/${setupData.laps}</div>
+
+<div class="timer-display">0:00.00</div>
+
+</div>
+
+<div style="display:flex; align-items:center;">
+
+<div class="speed-box hud-info-box"><span class="speed-text">0 km/h</span></div>
+
+<div class="minimap-container">${markersHTML}</div>
+
+<button class="quit-btn" onclick="quitGame(${i})">QUIT</button>
+
+</div>
+
+</div>
+
+<div class="feedback-overlay" id="fb-p${i}">NICE!</div>
+
+<div class="lap-popup" id="lap-popup-p${i}">LAP 2</div>
+
+<div class="finish-text">FINISH!</div>
+
+<div class="math-box">
+
+<div class="math-question">Ready?</div>
+
+<div class="math-options">
+
+<button class="math-btn">A</button><button class="math-btn">B</button><button class="math-btn">C</button>
+
+</div>
+
+</div>
+
+`;
+
+uiContainer.appendChild(panel);
+
+p.generateMath();
+
+}
+
+
+// Buat AI untuk Story Mode (4 Lawan)
+
+if (currentMode === 'STORY') {
+
+for(let j=1; j<=4; j++) {
+
+let startOffset = j - (totalBikes - 1) / 2;
+
+let ai = new Player(j, COLORS[j], true, startOffset);
+
+players.push(ai);
+
+scene.add(ai.mesh);
+
+// Update warna marker AI di minimap player
+
+let aiMarker = document.getElementById(`marker-p${j}-in-p0`);
+
+if(aiMarker) aiMarker.style.background = '#' + COLORS[j].toString(16);
+
+}
+
+}
+
+
+gameActive = true;
+
+animate();
+
+startCountdown();
+
+}
+
+
+function showGameOver() {
+
+gameActive = false;
+
+document.getElementById('game-ui').classList.add('hide');
+
+const goScreen = document.getElementById('game-over');
+
+goScreen.classList.remove('hide');
+
+const sb = document.getElementById('score-board');
+
+sb.innerHTML = `
+
+<div class="score-row score-header">
+
+<span>Pos</span>
+
+<span>Pembalap</span>
+
+<span>Waktu & Poin</span>
+
+</div>
+
+`;
+
+
+// Urutkan berdasarkan Finish Order. Yang tidak finish (Quit/Sisa) ditaruh belakang
+
+let rankedPlayers = [...finishOrder];
+
+// Masukkan pemain yang DNF (Quit atau belum finish saat force stop)
+
+players.forEach(p => {
+
+if (!finishOrder.includes(p)) {
+
+rankedPlayers.push(p);
+
+}
+
+});
+
+
+rankedPlayers.forEach((p, idx) => {
+
+let name = p.isAI ? `CPU Opponent ${p.id}` : `Player ${p.id+1}`;
+
+let timeStr = p.finished ? formatTime(p.finishTime) : "DNF (Gave Up)";
+
+let points = (p.finished && idx < POINTS_SYSTEM.length) ? POINTS_SYSTEM[idx] : 0;
+
+// Jika ini pemain kita di story mode, tambahkan ke global season points
+
+if (currentMode === 'STORY' && !p.isAI) {
+
+globalSeasonPoints += points;
+
+}
+
+
+let row = document.createElement('div');
+
+row.className = 'score-row';
+
+if(p.id === 0 && currentMode === 'STORY') row.style.border = "2px solid #00eaff"; // Highlight player
+
+
+row.innerHTML = `
+
+<span style="color:${'#'+p.color.toString(16)}">#${idx+1}</span> 
+
+<span>${name}</span> 
+
+<span>${timeStr} <b style="color:#ffd700">(+${points} Pts)</b></span>
+
+`;
+
+sb.appendChild(row);
+
+});
+
+
+// Logika Unlock Story Mode
+
+if (currentMode === 'STORY') {
+
+// Cek jika player finish di posisi 1, 2, atau 3 (Podium)
+
+let playerRank = rankedPlayers.findIndex(p => p.id === 0);
+
+if (playerRank !== -1 && playerRank < 3 && rankedPlayers[playerRank].finished) {
+
+unlockNextLevel();
+
+let msg = document.createElement('div');
+
+msg.innerHTML = `<h3 style="color:#00ff66">SELAMAT! LEVEL BERIKUTNYA TERBUKA</h3>`;
+
+sb.appendChild(msg);
+
+} else {
+
+let msg = document.createElement('div');
+
+msg.innerHTML = `<h3 style="color:#ff3333">GAGAL PODIUM. COBA LAGI!</h3>`;
+
+sb.appendChild(msg);
+
+}
+
+// Tampilkan total poin musim
+
+let totalDiv = document.createElement('div');
+
+totalDiv.innerHTML = `<h2 style="margin-top:20px; color:#ffd700">TOTAL POIN MUSIM: ${globalSeasonPoints}</h2>`;
+
+sb.appendChild(totalDiv);
+
+}
+
+}
+
+
+function unlockNextLevel() {
+
+let currentLvlObj = STORY_LEVELS.find(l => l.laps === setupData.laps && l.aiSpeed === setupData.aiSpeed);
+
+if (currentLvlObj) {
+
+let nextIdx = STORY_LEVELS.indexOf(currentLvlObj) + 1;
+
+if (nextIdx < STORY_LEVELS.length) STORY_LEVELS[nextIdx].locked = false;
+
+}
+
+}
+
+
+window.goToMainMenu = () => { gameActive = false; toggleScreen('main-menu'); };
+
+window.showStoryMenu = () => {
+
+toggleScreen('story-menu');
+
+document.getElementById('story-points').innerText = `Total Poin Musim: ${globalSeasonPoints}`;
+
+const cont = document.getElementById('level-container');
+
+cont.innerHTML = '';
+
+STORY_LEVELS.forEach(lvl => {
+
+const div = document.createElement('div');
+
+div.className = `level-card ${lvl.locked ? '' : 'unlocked'}`;
+
+div.innerHTML = `<h3>${lvl.name}</h3><p>${lvl.laps} Laps</p>`;
+
+if(!lvl.locked) div.onclick = () => startStoryLevel(lvl.id);
+
+cont.appendChild(div);
+
+});
+
+};
+
+window.showVersusMenu = () => { toggleScreen('versus-menu'); setPlayers(2); setLaps(3); };
+
+window.setPlayers = (n) => { setupData.playerCount = n; updateBtnGroup('player-select', n + ' Player'); };
+
+window.setLaps = (n) => { setupData.laps = n; updateBtnGroup('lap-select', n + ' Lap'); };
+
+function toggleScreen(id) { document.querySelectorAll('.screen').forEach(el => el.classList.add('hide')); document.getElementById(id).classList.remove('hide'); }
+
+function updateBtnGroup(id, txt) { document.getElementById(id).querySelectorAll('button').forEach(b => { if(b.innerText.includes(txt)) b.classList.add('active'); else b.classList.remove('active'); }); }
+
+</script>
+
 </body>
+
 </html>
+
