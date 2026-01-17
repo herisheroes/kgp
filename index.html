@@ -8,7 +8,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Math Moto Racing 3D: Championship Edition</title>
+<title>Komandan Turbo : Misi Penjumlahan</title>
 
 <style>
 
@@ -39,28 +39,45 @@ touch-action: none;
 canvas { display: block; width: 100%; height: 100%; }
 
 
-/* UI OVERLAYS */
+/* UI OVERLAYS - UPDATE BACKGROUND */
 
 .screen {
 
 position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 
-background: rgba(0,0,0,0.85); z-index: 100;
+/* Background Image Baru */
+
+background: url('https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backkt0.png') no-repeat center center;
+
+background-size: cover;
+
+z-index: 100;
 
 display: flex; flex-direction: column; justify-content: center; align-items: center;
 
-transition: opacity 0.5s; backdrop-filter: blur(5px);
+transition: opacity 0.5s;
 
 }
+
+/* Overlay gelap di atas background agar tulisan terbaca */
+
+.screen::before {
+
+content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+
+background: rgba(0,0,0,0.6); z-index: -1;
+
+}
+
 
 .hide { display: none !important; }
 
 
-h1 { color: #00eaff; font-size: 4vmin; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
+h1 { color: #00eaff; font-size: 5vmin; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
 
-h2 { color: #fff; font-size: 2.5vmin; margin-bottom: 30px; }
+h2 { color: #fff; font-size: 3vmin; margin-bottom: 30px; text-shadow: 0 0 10px black; }
 
-p { color: #ccc; max-width: 600px; text-align: center; font-size: 1.5vmin; line-height: 1.5; margin-bottom: 20px;}
+p { color: #eee; max-width: 600px; text-align: center; font-size: 2vmin; line-height: 1.5; margin-bottom: 20px; text-shadow: 1px 1px 2px black;}
 
 
 .btn-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
@@ -69,7 +86,7 @@ p { color: #ccc; max-width: 600px; text-align: center; font-size: 1.5vmin; line-
 
 padding: 1.5vmin 4vmin; font-size: 2vmin;
 
-background: rgba(0, 234, 255, 0.1); color: #00eaff;
+background: rgba(0, 0, 0, 0.7); color: #00eaff;
 
 border: 2px solid #00eaff; border-radius: 10px;
 
@@ -77,28 +94,97 @@ font-family: 'Orbitron', sans-serif; font-weight: bold;
 
 cursor: pointer; transition: all 0.2s; text-transform: uppercase;
 
+box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+
 }
 
 .action-btn:hover, .action-btn.active {
 
-background: #00eaff; color: #000; box-shadow: 0 0 20px #00eaff; transform: scale(1.05);
+background: #00eaff; color: #000; box-shadow: 0 0 30px #00eaff; transform: scale(1.1);
 
 }
 
 
+/* Loading Screen Specifics */
+
+#loading-screen {
+
+background: #000; /* Loading hitam polos atau background beda */
+
+z-index: 200;
+
+}
+
+.loader-bar {
+
+width: 300px; height: 10px; background: #333; border-radius: 5px;
+
+margin-top: 20px; overflow: hidden; position: relative;
+
+}
+
+.loader-fill {
+
+height: 100%; width: 0%; background: #00eaff;
+
+box-shadow: 0 0 10px #00eaff;
+
+transition: width 0.2s;
+
+}
+
+.loading-text {
+
+font-size: 2vmin; color: #00eaff; animation: blink 1s infinite;
+
+}
+
+
+/* Start Button Besar di Splash */
+
+.start-btn-large {
+
+font-size: 4vmin; padding: 2vmin 6vmin;
+
+background: linear-gradient(45deg, #00eaff, #008cff);
+
+color: white; border: none; border-radius: 50px;
+
+box-shadow: 0 0 40px rgba(0, 234, 255, 0.5);
+
+animation: pulseBtn 2s infinite;
+
+}
+
+
+@keyframes pulseBtn {
+
+0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); }
+
+50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 234, 255, 0.8); }
+
+100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); }
+
+}
+
+@keyframes blink { 50% { opacity: 0.5; } }
+
+
+/* Level Cards */
+
 .level-card {
 
-background: #222; border: 1px solid #444; padding: 20px; margin: 10px;
+background: rgba(0,0,0,0.8); border: 1px solid #444; padding: 20px; margin: 10px;
 
 border-radius: 10px; width: 200px; text-align: center; cursor: pointer;
 
-opacity: 0.5; pointer-events: none;
+opacity: 0.5; pointer-events: none; transition: 0.3s;
 
 }
 
 .level-card.unlocked { opacity: 1; pointer-events: auto; border-color: #00eaff; }
 
-.level-card:hover { background: #333; transform: translateY(-5px); border-color: #fff; }
+.level-card:hover { background: rgba(0, 234, 255, 0.2); transform: translateY(-10px); border-color: #fff; box-shadow: 0 0 20px rgba(0,234,255,0.3); }
 
 
 /* IN-GAME UI */
@@ -163,25 +249,11 @@ border: 1px solid rgba(255,255,255,0.1);
 
 .quit-btn {
 
-pointer-events: auto;
+pointer-events: auto; background: rgba(255, 0, 0, 0.7); color: white;
 
-background: rgba(255, 0, 0, 0.7);
+border: 1px solid red; border-radius: 5px; padding: 5px 10px;
 
-color: white;
-
-border: 1px solid red;
-
-border-radius: 5px;
-
-padding: 5px 10px;
-
-font-size: 1.5vmin;
-
-cursor: pointer;
-
-margin-left: 10px;
-
-font-family: 'Orbitron', sans-serif;
+font-size: 1.5vmin; cursor: pointer; margin-left: 10px; font-family: 'Orbitron', sans-serif;
 
 }
 
@@ -207,17 +279,67 @@ background: red; transition: bottom 0.2s linear; box-shadow: 0 0 2px black;
 }
 
 
+/* Math Panel Effects */
+
 .math-box {
 
 pointer-events: auto; background: rgba(0, 0, 0, 0.85);
 
-border: 1px solid #fff; border-radius: 10px; padding: 10px;
+border: 2px solid #fff; border-radius: 10px; padding: 10px;
 
 text-align: center; width: 90%; margin: 0 auto 20px auto;
 
 align-self: center; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 
+transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
+
 }
+
+/* Animasi Benar */
+
+.anim-correct {
+
+border-color: #00ff66 !important;
+
+background-color: rgba(0, 255, 102, 0.2) !important;
+
+animation: popCorrect 0.3s ease-out;
+
+}
+
+@keyframes popCorrect {
+
+0% { transform: scale(1); }
+
+50% { transform: scale(1.1); }
+
+100% { transform: scale(1); }
+
+}
+
+
+/* Animasi Salah */
+
+.anim-wrong {
+
+border-color: #ff3333 !important;
+
+background-color: rgba(255, 51, 51, 0.2) !important;
+
+animation: shakeWrong 0.4s ease-in-out;
+
+}
+
+@keyframes shakeWrong {
+
+0%, 100% { transform: translateX(0); }
+
+20%, 60% { transform: translateX(-10px); }
+
+40%, 80% { transform: translateX(10px); }
+
+}
+
 
 .math-question { font-size: 3vmin; margin-bottom: 10px; color: #fff; }
 
@@ -266,8 +388,6 @@ transition: transform 0.5s, opacity 0.5s; opacity: 0; z-index: 50; pointer-event
 
 .lap-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 
-
-/* Finish Text Individual */
 
 .finish-text {
 
@@ -336,13 +456,41 @@ font-size: 2vmin;
 <div id="game-container"></div>
 
 
+<!-- LOADING SCREEN -->
+
+<div id="loading-screen" class="screen">
+
+<h2 class="loading-text">MENGAMBIL DATA PEMBALAP DAN SIRKUIT...</h2>
+
+<div class="loader-bar">
+
+<div class="loader-fill" id="loader-fill"></div>
+
+</div>
+
+</div>
+
+
+<!-- SPLASH SCREEN -->
+
+<div id="splash-screen" class="screen hide">
+
+<h1 style="font-size: 6vmin; margin-bottom: 5px;">KOMANDAN TURBO</h1>
+
+<h2 style="color:#00eaff; font-size: 3vmin; letter-spacing: 5px;">MISI PENJUMLAHAN</h2>
+
+<p style="margin-top: 50px;">SIAPKAN LOGIKA & KECEPATANMU</p>
+
+<button class="action-btn start-btn-large" onclick="enterMainMenu()">START</button>
+
+</div>
+
+
 <!-- MAIN MENU -->
 
-<div id="main-menu" class="screen">
+<div id="main-menu" class="screen hide">
 
-<h1>Math Moto Racing 3D</h1>
-
-<p>Championship Edition</p>
+<h1>MAIN MENU</h1>
 
 <div class="btn-group">
 
@@ -361,9 +509,9 @@ font-size: 2vmin;
 
 <h1>Story Mode</h1>
 
-<h2>Pilih Level</h2>
+<h2>Pilih Sirkuit</h2>
 
-<div id="story-points" style="color: #ffd700; margin-bottom: 20px;">Total Poin Musim: 0</div>
+<div id="story-points" style="color: #ffd700; margin-bottom: 20px; font-size: 2.5vmin; text-shadow: 2px 2px 0 black;">Total Poin Musim: 0</div>
 
 <div id="level-container" class="btn-group"></div>
 
@@ -382,7 +530,7 @@ font-size: 2vmin;
 
 <div style="margin-bottom: 20px;">
 
-<h2>Pemain</h2>
+<h2>Jumlah Pemain</h2>
 
 <div class="btn-group" id="player-select">
 
@@ -398,7 +546,7 @@ font-size: 2vmin;
 
 <div style="margin-bottom: 20px;">
 
-<h2>Putaran (Lap)</h2>
+<h2>Jumlah Lap</h2>
 
 <div class="btn-group" id="lap-select">
 
@@ -482,7 +630,7 @@ const ROAD_LENGTH = 1000;
 
 const LAP_DISTANCE = 3000;
 
-const POINTS_SYSTEM = [10, 8, 6, 4, 2, 0]; // Juara 1 dpt 10, dst
+const POINTS_SYSTEM = [10, 8, 6, 4, 2, 0];
 
 const STORY_LEVELS = [
 
@@ -505,9 +653,9 @@ let roads = [];
 
 let players = [];
 
-let finishOrder = []; // Menyimpan urutan siapa yang finish duluan
+let finishOrder = []; 
 
-let globalSeasonPoints = 0; // Poin akumulasi Story Mode
+let globalSeasonPoints = 0; 
 
 
 let gameActive = false;
@@ -519,6 +667,52 @@ let currentMode = 'STORY';
 let setupData = { playerCount: 1, laps: 2 };
 
 let raceStartTime = null;
+
+
+// --- INITIAL LOADING ---
+
+window.onload = function() {
+
+// Simulasi Loading
+
+let progress = 0;
+
+const bar = document.getElementById('loader-fill');
+
+const interval = setInterval(() => {
+
+progress += Math.random() * 5;
+
+if(progress > 100) progress = 100;
+
+bar.style.width = progress + "%";
+
+if(progress === 100) {
+
+clearInterval(interval);
+
+setTimeout(() => {
+
+document.getElementById('loading-screen').classList.add('hide');
+
+document.getElementById('splash-screen').classList.remove('hide');
+
+}, 500);
+
+}
+
+}, 50);
+
+};
+
+
+window.enterMainMenu = function() {
+
+document.getElementById('splash-screen').classList.add('hide');
+
+document.getElementById('main-menu').classList.remove('hide');
+
+}
 
 
 // --- HELPER UTILS ---
@@ -566,8 +760,6 @@ this.finishTime = 0;
 
 this.hasQuit = false;
 
-// Distribusi posisi start berdasarkan jumlah pemain
-
 this.baseX = startOffset * 2.5; 
 
 this.mesh = createBike(color);
@@ -590,8 +782,6 @@ update() {
 
 if (this.hasQuit) return;
 
-// Jika sudah finish, motor melambat sampai berhenti
-
 if (this.finished) {
 
 if (this.speed > 0) {
@@ -599,8 +789,6 @@ if (this.speed > 0) {
 this.speed -= 0.02;
 
 this.mesh.position.z -= this.speed;
-
-// Tetap update kamera
 
 this.camera.position.z = this.mesh.position.z + 7;
 
@@ -618,11 +806,7 @@ if (this.isAI) {
 
 let targetSpeed = setupData.aiSpeed || 0.8;
 
-// Variasi kecepatan AI biar tidak barengan terus
-
 targetSpeed *= (0.9 + (this.id % 3) * 0.05); 
-
-// Rubber banding (biar ga ketinggalan jauh)
 
 let leadDistance = 0;
 
@@ -660,8 +844,6 @@ this.camera.position.x = this.baseX;
 this.camera.rotation.z = 0; 
 
 
-// Lap Check
-
 if (this.distance >= LAP_DISTANCE * this.lap) {
 
 if (this.lap >= setupData.laps) {
@@ -693,8 +875,6 @@ this.hasQuit = true;
 
 this.speed = 0;
 
-// Tampilkan status Quit di layar
-
 const panel = document.getElementById(`panel-p${this.id}`);
 
 if (panel) {
@@ -722,12 +902,7 @@ this.finished = true;
 
 this.finishTime = Date.now() - raceStartTime;
 
-// Masukkan ke daftar finish order untuk ranking
-
 finishOrder.push(this);
-
-
-// Tampilkan Teks FINISH
 
 if (!this.isAI) {
 
@@ -737,7 +912,7 @@ if (panel) {
 
 panel.querySelector('.finish-text').style.display = "block";
 
-panel.querySelector('.math-box').style.display = 'none'; // Sembunyikan soal
+panel.querySelector('.math-box').style.display = 'none';
 
 }
 
@@ -825,6 +1000,18 @@ if(this.finished || this.hasQuit) return;
 
 const feedback = document.getElementById(`fb-p${this.id}`);
 
+const panel = document.getElementById(`panel-p${this.id}`);
+
+const mathBox = panel.querySelector('.math-box');
+
+
+// Reset animasi lama
+
+mathBox.classList.remove('anim-correct', 'anim-wrong');
+
+void mathBox.offsetWidth; // Trigger reflow
+
+
 if (idx === this.correctIndex) {
 
 this.combo++;
@@ -833,11 +1020,15 @@ this.speed = Math.min(this.speed + 0.6, 3.5);
 
 feedback.innerText = "NICE!"; feedback.style.color = "#00ff66";
 
+mathBox.classList.add('anim-correct');
+
 } else {
 
 this.combo = 0; this.speed = 0.5; 
 
 feedback.innerText = "RESET!"; feedback.style.color = "#ff3333";
+
+mathBox.classList.add('anim-wrong');
 
 }
 
@@ -1046,7 +1237,7 @@ renderer.setSize(width, height);
 
 let n = players.length;
 
-if (currentMode === 'STORY') n = 1; // Story mode hanya render 1 layar
+if (currentMode === 'STORY') n = 1; 
 
 
 const stripWidth = width / n;
@@ -1120,15 +1311,9 @@ showNumber();
 }
 
 
-// --- MODIFIED: CHECK FINISH CONDITION ---
-
 function checkAllFinished() {
 
-// Tunggu sampai SEMUA pemain (Human & AI) selesai atau Quit
-
 if (players.every(p => p.finished || p.hasQuit)) {
-
-// Beri sedikit delay sebelum muncul Game Over
 
 setTimeout(showGameOver, 2000);
 
@@ -1177,7 +1362,7 @@ initScene();
 
 players = [];
 
-finishOrder = []; // Reset order
+finishOrder = []; 
 
 const uiContainer = document.getElementById('game-ui');
 
@@ -1185,22 +1370,14 @@ uiContainer.innerHTML = '';
 
 uiContainer.className = '';
 
-// Tentukan jumlah layar
-
 let uiCount = (currentMode === 'STORY') ? 1 : setupData.playerCount;
-
-// Tentukan total motor di jalan (Story: 1 Human + 4 AI = 5, Versus: setupData)
 
 let totalBikes = (currentMode === 'STORY') ? 5 : setupData.playerCount;
 
 uiContainer.classList.add(`grid-${uiCount}`);
 
 
-// Buat Pemain Manusia
-
 for (let i = 0; i < uiCount; i++) {
-
-// Hitung offset agar motor berada di tengah jalan secara rapi
 
 let startOffset = i - (totalBikes - 1) / 2;
 
@@ -1212,10 +1389,6 @@ scene.add(p.mesh);
 
 
 let markersHTML = `<div id="marker-p${i}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[i].toString(16)}; z-index:2; border:1px solid white;"></div>`;
-
-// Marker musuh (AI atau Human lain) akan diinject nanti
-
-// Tambahkan marker musuh awal
 
 for(let j=0; j<totalBikes; j++) {
 
@@ -1285,8 +1458,6 @@ p.generateMath();
 }
 
 
-// Buat AI untuk Story Mode (4 Lawan)
-
 if (currentMode === 'STORY') {
 
 for(let j=1; j<=4; j++) {
@@ -1298,8 +1469,6 @@ let ai = new Player(j, COLORS[j], true, startOffset);
 players.push(ai);
 
 scene.add(ai.mesh);
-
-// Update warna marker AI di minimap player
 
 let aiMarker = document.getElementById(`marker-p${j}-in-p0`);
 
@@ -1346,11 +1515,7 @@ sb.innerHTML = `
 `;
 
 
-// Urutkan berdasarkan Finish Order. Yang tidak finish (Quit/Sisa) ditaruh belakang
-
 let rankedPlayers = [...finishOrder];
-
-// Masukkan pemain yang DNF (Quit atau belum finish saat force stop)
 
 players.forEach(p => {
 
@@ -1371,8 +1536,6 @@ let timeStr = p.finished ? formatTime(p.finishTime) : "DNF (Gave Up)";
 
 let points = (p.finished && idx < POINTS_SYSTEM.length) ? POINTS_SYSTEM[idx] : 0;
 
-// Jika ini pemain kita di story mode, tambahkan ke global season points
-
 if (currentMode === 'STORY' && !p.isAI) {
 
 globalSeasonPoints += points;
@@ -1384,7 +1547,7 @@ let row = document.createElement('div');
 
 row.className = 'score-row';
 
-if(p.id === 0 && currentMode === 'STORY') row.style.border = "2px solid #00eaff"; // Highlight player
+if(p.id === 0 && currentMode === 'STORY') row.style.border = "2px solid #00eaff"; 
 
 
 row.innerHTML = `
@@ -1402,11 +1565,7 @@ sb.appendChild(row);
 });
 
 
-// Logika Unlock Story Mode
-
 if (currentMode === 'STORY') {
-
-// Cek jika player finish di posisi 1, 2, atau 3 (Podium)
 
 let playerRank = rankedPlayers.findIndex(p => p.id === 0);
 
@@ -1429,8 +1588,6 @@ msg.innerHTML = `<h3 style="color:#ff3333">GAGAL PODIUM. COBA LAGI!</h3>`;
 sb.appendChild(msg);
 
 }
-
-// Tampilkan total poin musim
 
 let totalDiv = document.createElement('div');
 
