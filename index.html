@@ -39,13 +39,11 @@ touch-action: none;
 canvas { display: block; width: 100%; height: 100%; }
 
 
-/* UI OVERLAYS - UPDATE BACKGROUND */
+/* UI OVERLAYS */
 
 .screen {
 
 position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-
-/* Background Image Baru */
 
 background: url('https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backkt0.png') no-repeat center center;
 
@@ -59,13 +57,11 @@ transition: opacity 0.5s;
 
 }
 
-/* Overlay gelap di atas background agar tulisan terbaca */
-
 .screen::before {
 
 content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 
-background: rgba(0,0,0,0.6); z-index: -1;
+background: rgba(0,0,0,0.7); z-index: -1;
 
 }
 
@@ -73,78 +69,64 @@ background: rgba(0,0,0,0.6); z-index: -1;
 .hide { display: none !important; }
 
 
-h1 { color: #00eaff; font-size: 5vmin; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
+/* TYPOGRAPHY RESPONSIVE */
 
-h2 { color: #fff; font-size: 3vmin; margin-bottom: 30px; text-shadow: 0 0 10px black; }
+h1 { color: #00eaff; font-size: 5vmin; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
 
-p { color: #eee; max-width: 600px; text-align: center; font-size: 2vmin; line-height: 1.5; margin-bottom: 20px; text-shadow: 1px 1px 2px black;}
+h2 { color: #fff; font-size: 3vmin; margin-bottom: 20px; text-shadow: 0 0 10px black; text-align: center; }
+
+p { color: #eee; max-width: 80%; text-align: center; font-size: 2vmin; line-height: 1.5; margin-bottom: 20px; text-shadow: 1px 1px 2px black;}
 
 
-.btn-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+/* BUTTONS & MENUS */
+
+.btn-group { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 90%; max-width: 800px; }
 
 .action-btn {
 
-padding: 1.5vmin 4vmin; font-size: 2vmin;
+padding: 2vmin 5vmin; font-size: 2.5vmin; /* Ukuran tombol lebih nyaman disentuh */
 
-background: rgba(0, 0, 0, 0.7); color: #00eaff;
+background: linear-gradient(180deg, rgba(0, 30, 60, 0.9), rgba(0, 0, 0, 0.9)); 
 
-border: 2px solid #00eaff; border-radius: 10px;
+color: #00eaff;
+
+border: 2px solid #00eaff; border-radius: 15px;
 
 font-family: 'Orbitron', sans-serif; font-weight: bold;
 
 cursor: pointer; transition: all 0.2s; text-transform: uppercase;
 
-box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+box-shadow: 0 0 15px rgba(0, 234, 255, 0.3);
+
+min-width: 150px;
+
+text-shadow: 0 0 5px #00eaff;
 
 }
 
 .action-btn:hover, .action-btn.active {
 
-background: #00eaff; color: #000; box-shadow: 0 0 30px #00eaff; transform: scale(1.1);
+background: #00eaff; color: #000; box-shadow: 0 0 40px #00eaff; transform: scale(1.05); text-shadow: none;
 
 }
 
-
-/* Loading Screen Specifics */
-
-#loading-screen {
-
-background: #000; /* Loading hitam polos atau background beda */
-
-z-index: 200;
-
-}
-
-.loader-bar {
-
-width: 300px; height: 10px; background: #333; border-radius: 5px;
-
-margin-top: 20px; overflow: hidden; position: relative;
-
-}
-
-.loader-fill {
-
-height: 100%; width: 0%; background: #00eaff;
-
-box-shadow: 0 0 10px #00eaff;
-
-transition: width 0.2s;
-
-}
-
-.loading-text {
-
-font-size: 2vmin; color: #00eaff; animation: blink 1s infinite;
-
-}
+.action-btn:active { transform: scale(0.95); }
 
 
-/* Start Button Besar di Splash */
+/* LOADING */
+
+#loading-screen { background: #000; z-index: 200; }
+
+.loader-bar { width: 60%; max-width: 400px; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; overflow: hidden; position: relative; }
+
+.loader-fill { height: 100%; width: 0%; background: #00eaff; box-shadow: 0 0 10px #00eaff; transition: width 0.2s; }
+
+.loading-text { font-size: 2.5vmin; color: #00eaff; animation: blink 1s infinite; text-align: center; }
+
 
 .start-btn-large {
 
-font-size: 4vmin; padding: 2vmin 6vmin;
+font-size: 5vmin; padding: 2vmin 8vmin;
 
 background: linear-gradient(45deg, #00eaff, #008cff);
 
@@ -152,63 +134,105 @@ color: white; border: none; border-radius: 50px;
 
 box-shadow: 0 0 40px rgba(0, 234, 255, 0.5);
 
-animation: pulseBtn 2s infinite;
+animation: pulseBtn 2s infinite; margin-top: 30px;
 
 }
 
 
-@keyframes pulseBtn {
+/* SELECTION GRIDS (MOTOR & TRACK) */
 
-0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); }
+.selection-grid {
 
-50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 234, 255, 0.8); }
+display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
 
-100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); }
+width: 100%; max-height: 60vh; overflow-y: auto; padding: 10px;
+
+scrollbar-width: thin; scrollbar-color: #00eaff #111;
 
 }
 
-@keyframes blink { 50% { opacity: 0.5; } }
+.card-item {
+
+background: rgba(0,0,0,0.8); border: 2px solid #444; padding: 10px;
+
+border-radius: 15px; width: 160px; text-align: center; cursor: pointer;
+
+transition: 0.3s; display: flex; flex-direction: column; align-items: center;
+
+box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+
+}
+
+.card-item:hover { transform: translateY(-5px); border-color: #fff; background: rgba(255,255,255,0.1); }
+
+.card-item.selected { border-color: #00eaff; box-shadow: 0 0 25px rgba(0,234,255,0.6); background: rgba(0, 234, 255, 0.2); transform: scale(1.05); }
+
+.card-item img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px; object-fit: cover; aspect-ratio: 16/9; }
+
+.card-title { font-size: 1.8vmin; margin-bottom: 5px; color: #fff; font-weight: bold; }
 
 
-/* Level Cards */
+/* LEVEL CARDS (STORY MODE) */
 
 .level-card {
 
-background: rgba(0,0,0,0.8); border: 1px solid #444; padding: 20px; margin: 10px;
+background-color: rgba(0,0,0,0.8);
 
-border-radius: 10px; width: 200px; text-align: center; cursor: pointer;
+background-size: cover; background-position: center;
 
-opacity: 0.5; pointer-events: none; transition: 0.3s;
+border: 2px solid #444; padding: 0; margin: 15px;
+
+border-radius: 15px; width: 220px; height: 140px;
+
+text-align: center; cursor: pointer; position: relative; overflow: hidden;
+
+opacity: 0.6; pointer-events: none; transition: 0.3s;
+
+box-shadow: 0 5px 15px black;
+
+}
+
+.level-card-overlay {
+
+background: rgba(0,0,0,0.7); width: 100%; height: 100%;
+
+display: flex; flex-direction: column; justify-content: center; align-items: center;
+
+transition: 0.3s;
 
 }
 
 .level-card.unlocked { opacity: 1; pointer-events: auto; border-color: #00eaff; }
 
-.level-card:hover { background: rgba(0, 234, 255, 0.2); transform: translateY(-10px); border-color: #fff; box-shadow: 0 0 20px rgba(0,234,255,0.3); }
+.level-card.unlocked .level-card-overlay { background: rgba(0,0,0,0.4); }
+
+.level-card:hover { transform: scale(1.05); border-color: #fff; box-shadow: 0 0 20px #00eaff; }
+
+.level-card:hover .level-card-overlay { background: rgba(0,0,0,0.2); }
+
+.lvl-title { font-size: 2.5vmin; color: #fff; text-shadow: 0 2px 4px black; font-weight: bold; }
+
+.lvl-desc { font-size: 1.5vmin; color: #00eaff; text-shadow: 0 1px 2px black; margin-top: 5px; }
 
 
 /* IN-GAME UI */
 
-#game-ui {
-
-position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-
-pointer-events: none; display: grid;
-
-}
+#game-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: grid; }
 
 .grid-1 { grid-template-columns: 1fr; }
 
 .grid-2 { grid-template-columns: 1fr 1fr; }
 
-.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; } /* Layout 3P disesuaikan */
 
-.grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.grid-3 .player-panel:last-child { grid-column: span 2; } /* Player 3 lebar di bawah */
+
+.grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 
 
 .player-panel {
 
-position: relative; border-right: 2px solid rgba(255,255,255,0.2);
+position: relative; border: 2px solid rgba(255,255,255,0.1);
 
 box-sizing: border-box; pointer-events: none; overflow: hidden;
 
@@ -216,236 +240,124 @@ display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;
 
 }
 
-.player-panel:last-child { border-right: none; }
+.p-color-bar { position: absolute; top: 0; left: 0; width: 100%; height: 5px; z-index: 5; }
 
 
-.p-color-bar { position: absolute; top: 0; left: 0; width: 100%; height: 5px; }
+.hud-top { 
 
+position: absolute; top: 10px; left: 10px; right: 10px; 
 
-.hud-top {
-
-position: absolute; top: 15px; left: 10px; right: 10px;
-
-display: flex; justify-content: space-between; align-items: flex-start;
+display: flex; justify-content: space-between; align-items: flex-start; 
 
 }
 
+.hud-info-box { 
 
-.hud-info-box {
+background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 8px; 
 
-background: rgba(0,0,0,0.6); padding: 5px 10px;
+font-size: 1.8vmin; text-align: left; border: 1px solid rgba(255,255,255,0.2); 
 
-border-radius: 5px; font-size: 1.5vmin; text-align: left;
-
-border: 1px solid rgba(255,255,255,0.1);
-
-}
-
-
-.speed-box { text-align: right; font-size: 2vmin; color: #fff; text-shadow: 0 0 5px currentColor; }
-
-.timer-display { font-family: monospace; font-size: 1.8vmin; color: #ffd700; margin-top: 5px; }
-
-
-.quit-btn {
-
-pointer-events: auto; background: rgba(255, 0, 0, 0.7); color: white;
-
-border: 1px solid red; border-radius: 5px; padding: 5px 10px;
-
-font-size: 1.5vmin; cursor: pointer; margin-left: 10px; font-family: 'Orbitron', sans-serif;
+backdrop-filter: blur(4px);
 
 }
 
-.quit-btn:hover { background: red; }
+.speed-box { text-align: right; font-size: 2.5vmin; color: #fff; text-shadow: 0 0 10px currentColor; font-weight: bold; }
 
+.timer-display { font-family: monospace; font-size: 2vmin; color: #ffd700; margin-top: 5px; }
 
-.minimap-container {
+.quit-btn { 
 
-position: relative; width: 10px; height: 100px;
+pointer-events: auto; background: rgba(220, 20, 60, 0.8); color: white; 
 
-background: rgba(255,255,255,0.1); border: 1px solid #555;
+border: 1px solid #ff4444; border-radius: 8px; padding: 5px 15px; 
 
-border-radius: 5px; margin-left: 10px;
+font-size: 1.8vmin; cursor: pointer; margin-left: 10px; font-family: 'Orbitron', sans-serif; font-weight: bold;
 
-}
-
-.minimap-marker {
-
-position: absolute; left: -3px; width: 16px; height: 4px;
-
-background: red; transition: bottom 0.2s linear; box-shadow: 0 0 2px black;
+transition: 0.2s;
 
 }
 
+.quit-btn:hover { background: red; box-shadow: 0 0 10px red; }
 
-/* Math Panel Effects */
+
+.minimap-container { position: relative; width: 15px; height: 100px; background: rgba(255,255,255,0.1); border: 1px solid #777; border-radius: 8px; margin-left: 10px; overflow: hidden; }
+
+.minimap-marker { position: absolute; left: 0; width: 100%; height: 4px; background: red; transition: bottom 0.2s linear; box-shadow: 0 0 4px black; z-index: 2; }
+
+
+/* MATH PANEL RESPONSIVE */
 
 .math-box {
 
-pointer-events: auto; background: rgba(0, 0, 0, 0.85);
+pointer-events: auto; background: rgba(0, 0, 0, 0.9); border: 2px solid #fff; border-radius: 15px; padding: 15px;
 
-border: 2px solid #fff; border-radius: 10px; padding: 10px;
+text-align: center; width: 90%; max-width: 500px; margin: 0 auto 20px auto; align-self: center; z-index: 20; 
 
-text-align: center; width: 90%; margin: 0 auto 20px auto;
-
-align-self: center; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 
 transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
 
 }
 
-/* Animasi Benar */
+.anim-correct { border-color: #00ff66 !important; background-color: rgba(0, 255, 102, 0.2) !important; animation: popCorrect 0.3s ease-out; }
 
-.anim-correct {
+.anim-wrong { border-color: #ff3333 !important; background-color: rgba(255, 51, 51, 0.2) !important; animation: shakeWrong 0.4s ease-in-out; }
 
-border-color: #00ff66 !important;
+.math-question { font-size: 4vmin; margin-bottom: 15px; color: #fff; font-weight: bold; letter-spacing: 2px; }
 
-background-color: rgba(0, 255, 102, 0.2) !important;
+.math-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
-animation: popCorrect 0.3s ease-out;
+/* Responsiveness for math buttons */
 
-}
-
-@keyframes popCorrect {
-
-0% { transform: scale(1); }
-
-50% { transform: scale(1.1); }
-
-100% { transform: scale(1); }
-
-}
+@media (max-width: 600px) { .math-options { grid-template-columns: 1fr; } }
 
 
-/* Animasi Salah */
+.math-btn { 
 
-.anim-wrong {
+background: linear-gradient(180deg, #333, #111); border: 1px solid #555; color: white; 
 
-border-color: #ff3333 !important;
+padding: 15px; font-size: 2.5vmin; font-family: 'Orbitron', sans-serif; 
 
-background-color: rgba(255, 51, 51, 0.2) !important;
-
-animation: shakeWrong 0.4s ease-in-out;
+cursor: pointer; border-radius: 8px; transition: background 0.1s; 
 
 }
 
-@keyframes shakeWrong {
+.math-btn:hover { background: #444; border-color: #00eaff; }
 
-0%, 100% { transform: translateX(0); }
-
-20%, 60% { transform: translateX(-10px); }
-
-40%, 80% { transform: translateX(10px); }
-
-}
+.math-btn:active { background: #fff; color: #000; transform: scale(0.95); }
 
 
-.math-question { font-size: 3vmin; margin-bottom: 10px; color: #fff; }
+.feedback-overlay { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 6vmin; font-weight: bold; opacity: 0; transition: opacity 0.3s; text-shadow: 3px 3px 0 #000; white-space: nowrap; z-index: 30; pointer-events: none; }
 
-.math-options { display: grid; grid-template-columns: 1fr; gap: 5px; }
-
-@media (min-width: 800px) { .math-options { grid-template-columns: 1fr 1fr 1fr; } }
-
-
-.math-btn {
-
-background: #333; border: 1px solid #555; color: white;
-
-padding: 1.5vmin; font-size: 2vmin; font-family: 'Orbitron', sans-serif;
-
-cursor: pointer; border-radius: 5px; transition: background 0.1s;
-
-}
-
-.math-btn:hover { background: #444; border-color: #888; }
-
-.math-btn:active { background: #fff; color: #000; }
-
-
-.feedback-overlay {
-
-position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-
-font-size: 5vmin; font-weight: bold; opacity: 0; transition: opacity 0.3s;
-
-text-shadow: 2px 2px 0 #000; white-space: nowrap; z-index: 30;
-
-}
-
-
-.lap-popup {
-
-position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0);
-
-font-size: 8vmin; font-weight: bold; color: #ffd700;
-
-text-shadow: 0 0 20px #ffaa00, 2px 2px 5px black;
-
-transition: transform 0.5s, opacity 0.5s; opacity: 0; z-index: 50; pointer-events: none; white-space: nowrap;
-
-}
+.lap-popup { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 8vmin; font-weight: bold; color: #ffd700; text-shadow: 0 0 20px #ffaa00, 3px 3px 8px black; transition: transform 0.5s, opacity 0.5s; opacity: 0; z-index: 50; pointer-events: none; white-space: nowrap; }
 
 .lap-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 
-
-.finish-text {
-
-position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-
-font-size: 8vmin; font-weight: bold; color: #00eaff;
-
-text-shadow: 0 0 20px #00eaff, 2px 2px 5px black;
-
-display: none; z-index: 60;
-
-}
+.finish-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10vmin; font-weight: bold; color: #00eaff; text-shadow: 0 0 30px #00eaff, 3px 3px 10px black; display: none; z-index: 60; animation: pulseBtn 1s infinite; }
 
 
-#countdown-layer {
+#countdown-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 50; background: rgba(0,0,0,0.3); }
 
-position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+.countdown-text { font-size: 25vmin; font-weight: bold; color: #fff; animation: zoomPop 0.8s ease-out; text-shadow: 0 0 20px currentColor; }
 
-display: flex; justify-content: center; align-items: center; pointer-events: none;
+#game-over { background: rgba(0,0,0,0.95); overflow-y: auto; }
 
-z-index: 50; background: rgba(0,0,0,0.3);
+#score-board { margin: 20px 0; width: 90%; max-width: 800px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; border: 1px solid #333; }
 
-}
+.score-row { display: grid; grid-template-columns: 0.5fr 2fr 1.5fr; padding: 15px; border-bottom: 1px solid #444; font-size: 2.5vmin; align-items: center; }
 
-.countdown-text {
-
-font-size: 20vmin; font-weight: bold; color: #fff;
-
-animation: zoomPop 0.8s ease-out; text-shadow: 0 0 20px currentColor;
-
-}
-
-@keyframes zoomPop {
-
-0% { transform: scale(0.5); opacity: 0; }
-
-50% { transform: scale(1.2); opacity: 1; }
-
-100% { transform: scale(1); opacity: 0; }
-
-}
+.score-header { font-weight: bold; color: #00eaff; border-bottom: 3px solid #00eaff; font-size: 2.8vmin; }
 
 
-#game-over { background: rgba(0,0,0,0.95); }
+@keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); } 50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 234, 255, 0.8); } 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); } }
 
-#score-board { margin: 20px 0; width: 90%; max-width: 800px; }
+@keyframes blink { 50% { opacity: 0.5; } }
 
-.score-row { 
+@keyframes popCorrect { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-display: grid; grid-template-columns: 1fr 1fr 1fr; 
+@keyframes shakeWrong { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
 
-padding: 10px; border-bottom: 1px solid #333; 
-
-font-size: 2vmin;
-
-}
-
-.score-header { font-weight: bold; color: #00eaff; border-bottom: 2px solid #00eaff; }
+@keyframes zoomPop { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
 
 </style>
 
@@ -462,11 +374,7 @@ font-size: 2vmin;
 
 <h2 class="loading-text">MENGAMBIL DATA PEMBALAP DAN SIRKUIT...</h2>
 
-<div class="loader-bar">
-
-<div class="loader-fill" id="loader-fill"></div>
-
-</div>
+<div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
 
 </div>
 
@@ -503,24 +411,24 @@ font-size: 2vmin;
 </div>
 
 
-<!-- STORY MODE SELECT -->
+<!-- STORY MODE: LEVEL SELECT -->
 
 <div id="story-menu" class="screen hide">
 
 <h1>Story Mode</h1>
 
-<h2>Pilih Sirkuit</h2>
+<h2>Pilih Level</h2>
 
-<div id="story-points" style="color: #ffd700; margin-bottom: 20px; font-size: 2.5vmin; text-shadow: 2px 2px 0 black;">Total Poin Musim: 0</div>
+<div id="story-points" style="color: #ffd700; margin-bottom: 20px; font-size: 3vmin; text-shadow: 2px 2px 0 black; font-weight: bold;">Total Poin Musim: 0</div>
 
-<div id="level-container" class="btn-group"></div>
+<div id="level-container" class="btn-group" style="width:100%; max-width:1000px;"></div>
 
 <button class="action-btn" style="margin-top: 30px;" onclick="goToMainMenu()">Kembali</button>
 
 </div>
 
 
-<!-- VERSUS SETUP -->
+<!-- VERSUS: SETUP -->
 
 <div id="versus-menu" class="screen hide">
 
@@ -528,7 +436,7 @@ font-size: 2vmin;
 
 <p>Setup Multiplayer</p>
 
-<div style="margin-bottom: 20px;">
+<div style="margin-bottom: 30px;">
 
 <h2>Jumlah Pemain</h2>
 
@@ -544,7 +452,7 @@ font-size: 2vmin;
 
 </div>
 
-<div style="margin-bottom: 20px;">
+<div style="margin-bottom: 30px;">
 
 <h2>Jumlah Lap</h2>
 
@@ -560,9 +468,39 @@ font-size: 2vmin;
 
 </div>
 
-<button class="action-btn" style="margin-top: 20px; background: #00eaff; color: #000;" onclick="startVersus()">MULAI BALAPAN</button>
+<button class="action-btn" style="margin-top: 20px; min-width: 200px;" onclick="showTrackSelect()">Lanjut</button>
 
-<button class="action-btn" style="margin-top: 10px;" onclick="goToMainMenu()">Kembali</button>
+<br>
+
+<button class="action-btn" style="margin-top: 10px; background: transparent; border-color: #666; color: #ccc;" onclick="goToMainMenu()">Kembali</button>
+
+</div>
+
+
+<!-- SELECT TRACK (VERSUS) -->
+
+<div id="track-select-menu" class="screen hide">
+
+<h1>Pilih Lokasi Balap</h1>
+
+<div id="track-container" class="selection-grid"></div>
+
+<button class="action-btn" style="margin-top: 20px;" onclick="showVersusMenu()">Kembali</button>
+
+</div>
+
+
+<!-- SELECT BIKE (GLOBAL) -->
+
+<div id="bike-select-menu" class="screen hide">
+
+<h1>Pilih Motor</h1>
+
+<p>Pilih kendaraan andalanmu untuk misi ini!</p>
+
+<div id="bike-container" class="selection-grid"></div>
+
+<button class="action-btn" style="margin-top: 30px; background: linear-gradient(45deg, #00eaff, #008cff); color: white; min-width: 250px; font-size: 3vmin;" onclick="confirmStartGame()">MULAI BALAPAN</button>
 
 </div>
 
@@ -582,12 +520,10 @@ font-size: 2vmin;
 
 <div id="score-board"></div>
 
-<button class="action-btn" onclick="goToMainMenu()">Menu Utama</button>
+<button class="action-btn" style="margin-top:20px;" onclick="goToMainMenu()">Menu Utama</button>
 
 </div>
 
-
-<!-- Import Three.js -->
 
 <script type="importmap">
 
@@ -613,15 +549,39 @@ import * as THREE from 'three';
 
 const ASSETS = {
 
-body: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/bikebody.png',
-
 road: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/road.png',
-
-sky: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/skybox.png',
 
 tire: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/tire.png'
 
 };
+
+
+const BIKES = [
+
+{ id: 0, name: "Futuristik Standar", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor1.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor1.png" },
+
+{ id: 1, name: "Sport Agresif", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor2.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor2.png" },
+
+{ id: 2, name: "Ramah Anak", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor3.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor3.png" },
+
+{ id: 3, name: "Listrik Canggih", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor4.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor4.png" },
+
+{ id: 4, name: "Legendaris", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor5.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor5.png" }
+
+];
+
+
+const BACKGROUNDS = [
+
+{ id: 0, name: "Jalan Latihan", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl1.png" },
+
+{ id: 1, name: "Gurun Pasir", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl2.png" },
+
+{ id: 2, name: "Hutan Rimba", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl3.png" },
+
+{ id: 3, name: "Luar Angkasa", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl1.png" }
+
+];
 
 
 const COLORS = [0x00eaff, 0xff3333, 0x00ff66, 0xffaa00, 0xaa00ff, 0x00ffff];
@@ -634,20 +594,22 @@ const POINTS_SYSTEM = [10, 8, 6, 4, 2, 0];
 
 const STORY_LEVELS = [
 
-{ id: 1, name: "Tutorial Track", laps: 1, aiSpeed: 0.6, locked: false },
+{ id: 1, name: "Jalan Latihan", bgIdx: 0, laps: 1, aiSpeed: 0.6, locked: false },
 
-{ id: 2, name: "Speedway", laps: 2, aiSpeed: 0.9, locked: true },
+{ id: 2, name: "Gurun", bgIdx: 1, laps: 2, aiSpeed: 0.9, locked: true },
 
-{ id: 3, name: "Hyper Lane", laps: 3, aiSpeed: 1.2, locked: true },
+{ id: 3, name: "Hutan", bgIdx: 2, laps: 3, aiSpeed: 1.2, locked: true },
 
-{ id: 4, name: "Champion Road", laps: 4, aiSpeed: 1.5, locked: true }
+{ id: 4, name: "Luar Angkasa", bgIdx: 3, laps: 4, aiSpeed: 1.5, locked: true }
 
 ];
 
 
 let scene, renderer, textureLoader;
 
-let texBody, texRoad, texSky, texTire; 
+let texRoad, texTire; 
+
+let texBikeMap = {}; 
 
 let roads = [];
 
@@ -664,7 +626,7 @@ let isCountingDown = false;
 
 let currentMode = 'STORY'; 
 
-let setupData = { playerCount: 1, laps: 2 };
+let setupData = { playerCount: 1, laps: 2, bgUrl: '', bikeId: 0 };
 
 let raceStartTime = null;
 
@@ -672,8 +634,6 @@ let raceStartTime = null;
 // --- INITIAL LOADING ---
 
 window.onload = function() {
-
-// Simulasi Loading
 
 let progress = 0;
 
@@ -708,9 +668,7 @@ document.getElementById('splash-screen').classList.remove('hide');
 
 window.enterMainMenu = function() {
 
-document.getElementById('splash-screen').classList.add('hide');
-
-document.getElementById('main-menu').classList.remove('hide');
+toggleScreen('main-menu');
 
 }
 
@@ -736,7 +694,7 @@ return `${min}:${sec.toString().padStart(2, '0')}.${centi.toString().padStart(2,
 
 class Player {
 
-constructor(id, color, isAI = false, startOffset = 0) {
+constructor(id, color, isAI = false, startOffset = 0, bikeTextureUrl) {
 
 this.id = id;
 
@@ -762,7 +720,7 @@ this.hasQuit = false;
 
 this.baseX = startOffset * 2.5; 
 
-this.mesh = createBike(color);
+this.mesh = createBike(color, bikeTextureUrl);
 
 this.mesh.position.set(this.baseX, 0, 0);
 
@@ -771,7 +729,6 @@ this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
 this.camera.position.set(this.baseX, 3, 7);
 
 this.camera.rotation.x = -0.25;
-
 
 this.correctIndex = 0;
 
@@ -797,7 +754,6 @@ this.camera.position.z = this.mesh.position.z + 7;
 return; 
 
 }
-
 
 if (isCountingDown) return;
 
@@ -829,19 +785,13 @@ this.mesh.position.z -= moveStep;
 
 this.distance += moveStep;
 
-
 this.mesh.position.x = this.baseX; 
 
 this.mesh.rotation.y = 0; 
 
-
-const targetCamZ = this.mesh.position.z + 7;
-
-this.camera.position.z = targetCamZ;
+this.camera.position.z = this.mesh.position.z + 7;
 
 this.camera.position.x = this.baseX; 
-
-this.camera.rotation.z = 0; 
 
 
 if (this.distance >= LAP_DISTANCE * this.lap) {
@@ -869,29 +819,9 @@ this.updateHUDStats();
 
 quitRace() {
 
-if (this.finished || this.hasQuit) return;
+// Diperbarui: Langsung keluar ke Main Menu
 
-this.hasQuit = true;
-
-this.speed = 0;
-
-const panel = document.getElementById(`panel-p${this.id}`);
-
-if (panel) {
-
-const finishText = panel.querySelector('.finish-text');
-
-finishText.innerText = "GAVE UP";
-
-finishText.style.color = "red";
-
-finishText.style.display = "block";
-
-panel.querySelector('.math-box').style.display = 'none';
-
-}
-
-checkAllFinished();
+window.goToMainMenu();
 
 }
 
@@ -916,6 +846,14 @@ panel.querySelector('.math-box').style.display = 'none';
 
 }
 
+// FITUR BARU: Jika Story Mode dan Player finish, selesaikan game
+
+if (currentMode === 'STORY') {
+
+finishStoryModeNow();
+
+}
+
 }
 
 checkAllFinished();
@@ -931,9 +869,7 @@ const popup = document.getElementById(`lap-popup-p${this.id}`);
 
 if(popup) {
 
-popup.innerText = `LAP ${this.lap}`;
-
-popup.classList.add('show');
+popup.innerText = `LAP ${this.lap}`; popup.classList.add('show');
 
 setTimeout(() => { popup.classList.remove('show'); }, 1500);
 
@@ -958,7 +894,6 @@ const b = Math.floor(Math.random() * (max - min)) + min + 1;
 
 const ans = a + b;
 
-
 let opts = [ans];
 
 while(opts.length < 3) {
@@ -981,13 +916,7 @@ panel.querySelector('.math-question').innerText = `${a} + ${b} = ?`;
 
 const btns = panel.querySelectorAll('.math-btn');
 
-btns.forEach((btn, i) => {
-
-btn.innerText = opts[i];
-
-btn.onclick = () => this.answer(i);
-
-});
+btns.forEach((btn, i) => { btn.innerText = opts[i]; btn.onclick = () => this.answer(i); });
 
 }
 
@@ -1004,31 +933,19 @@ const panel = document.getElementById(`panel-p${this.id}`);
 
 const mathBox = panel.querySelector('.math-box');
 
-
-// Reset animasi lama
-
-mathBox.classList.remove('anim-correct', 'anim-wrong');
-
-void mathBox.offsetWidth; // Trigger reflow
-
+mathBox.classList.remove('anim-correct', 'anim-wrong'); void mathBox.offsetWidth; 
 
 if (idx === this.correctIndex) {
 
-this.combo++;
+this.combo++; this.speed = Math.min(this.speed + 0.6, 3.5); 
 
-this.speed = Math.min(this.speed + 0.6, 3.5); 
-
-feedback.innerText = "NICE!"; feedback.style.color = "#00ff66";
-
-mathBox.classList.add('anim-correct');
+feedback.innerText = "NICE!"; feedback.style.color = "#00ff66"; mathBox.classList.add('anim-correct');
 
 } else {
 
 this.combo = 0; this.speed = 0.5; 
 
-feedback.innerText = "RESET!"; feedback.style.color = "#ff3333";
-
-mathBox.classList.add('anim-wrong');
+feedback.innerText = "RESET!"; feedback.style.color = "#ff3333"; mathBox.classList.add('anim-wrong');
 
 }
 
@@ -1060,7 +977,6 @@ const speedVal = Math.floor(this.speed * 100);
 
 panel.querySelector('.speed-text').innerText = `${speedVal} km/h`;
 
-
 if (raceStartTime && !this.finished && !this.hasQuit) {
 
 panel.querySelector('.timer-display').innerText = formatTime(Date.now() - raceStartTime);
@@ -1070,7 +986,6 @@ panel.querySelector('.timer-display').innerText = formatTime(Date.now() - raceSt
 panel.querySelector('.timer-display').innerText = formatTime(this.finishTime);
 
 }
-
 
 const totalDist = LAP_DISTANCE * setupData.laps;
 
@@ -1091,6 +1006,52 @@ if(marker) marker.style.bottom = `${enemyPct}%`;
 }
 
 
+// --- STORY MODE FINISH LOGIC ---
+
+function finishStoryModeNow() {
+
+// Pemain baru saja finish. Hitung waktu teoretis untuk AI yang belum finish.
+
+const now = Date.now();
+
+const elapsedTime = now - raceStartTime;
+
+
+players.forEach(p => {
+
+if (!p.finished && p.isAI) {
+
+p.finished = true;
+
+const totalRaceDist = LAP_DISTANCE * setupData.laps;
+
+const remainingDist = totalRaceDist - p.distance;
+
+// Hindari pembagian 0, anggap speed min 0.5
+
+const speed = p.speed > 0.1 ? p.speed : 0.5; 
+
+// Konversi jarak ke waktu (frame updates approx 60fps -> 16.66ms per frame)
+
+// Jarak ditempuh per frame = speed.
+
+// Frame dibutuhkan = remainingDist / speed.
+
+const msNeeded = (remainingDist / speed) * 16.66;
+
+p.finishTime = elapsedTime + msNeeded;
+
+}
+
+});
+
+// Langsung tampilkan game over setelah jeda singkat
+
+setTimeout(showGameOver, 1500); 
+
+}
+
+
 // --- 3D SETUP ---
 
 function initScene() {
@@ -1099,20 +1060,21 @@ const container = document.getElementById('game-container');
 
 container.innerHTML = '';
 
-
 scene = new THREE.Scene();
 
 textureLoader = new THREE.TextureLoader();
 
-texSky = textureLoader.load(ASSETS.sky, () => {
+// Load Dynamic Skybox
 
-texSky.mapping = THREE.EquirectangularReflectionMapping;
+const skyUrl = setupData.bgUrl || ASSETS.sky;
 
-scene.background = texSky;
+textureLoader.load(skyUrl, (tex) => {
+
+tex.mapping = THREE.EquirectangularReflectionMapping;
+
+scene.background = tex;
 
 });
-
-scene.background = new THREE.Color(0x050510);
 
 texRoad = textureLoader.load(ASSETS.road);
 
@@ -1120,9 +1082,14 @@ texRoad.wrapS = THREE.RepeatWrapping; texRoad.wrapT = THREE.RepeatWrapping;
 
 texRoad.repeat.set(1, 20); 
 
-texBody = textureLoader.load(ASSETS.body);
-
 texTire = textureLoader.load(ASSETS.tire);
+
+
+BIKES.forEach(b => {
+
+if(!texBikeMap[b.id]) texBikeMap[b.id] = textureLoader.load(b.tex);
+
+});
 
 
 scene.fog = new THREE.Fog(0x1a1a2e, 20, 150);
@@ -1163,33 +1130,58 @@ scene.add(mesh); roads.push(mesh);
 }
 
 
-function createBike(color) {
+function createBike(color, texUrl) {
 
 const g = new THREE.Group();
 
-const bGeo = new THREE.BoxGeometry(0.8, 0.6, 1.8);
+let bikeTex = texUrl ? textureLoader.load(texUrl) : texBikeMap[setupData.bikeId];
 
-const bMat = new THREE.MeshStandardMaterial({ map: texBody, color: color, roughness: 0.4, metalness: 0.5 });
+const geo = new THREE.PlaneGeometry(2.5, 2.5); 
 
-const body = new THREE.Mesh(bGeo, bMat); body.position.y = 0.6; g.add(body);
+const mat = new THREE.MeshBasicMaterial({ 
+
+map: bikeTex, 
+
+transparent: true, 
+
+side: THREE.DoubleSide,
+
+alphaTest: 0.1 
+
+});
+
+const sprite = new THREE.Mesh(geo, mat);
+
+sprite.position.y = 1.25; 
+
+g.add(sprite);
 
 
-const wGeo = new THREE.BoxGeometry(0.7, 0.3, 0.5);
+const shadowGeo = new THREE.CircleGeometry(1, 32);
 
-const wMat = new THREE.MeshPhongMaterial({ color: 0x000000, opacity: 0.8, transparent: true });
+const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0.5, transparent: true });
 
-const wind = new THREE.Mesh(wGeo, wMat); wind.position.set(0, 1.0, -0.4); wind.rotation.x = -0.4; g.add(wind);
+const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+
+shadow.rotation.x = -Math.PI / 2;
+
+shadow.position.y = 0.02;
+
+g.add(shadow);
 
 
-const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.25, 32);
+const markGeo = new THREE.ConeGeometry(0.2, 0.3, 4);
 
-const wheelMat = new THREE.MeshStandardMaterial({ map: texTire, color: 0xffffff, roughness: 0.8 });
+const markMat = new THREE.MeshBasicMaterial({ color: color });
 
-const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.rotation.z = Math.PI / 2; w1.position.set(0, 0.4, -1.0);
+const marker = new THREE.Mesh(markGeo, markMat);
 
-const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.rotation.z = Math.PI / 2; w2.position.set(0, 0.4, 1.0);
+marker.position.y = 2.6; 
 
-g.add(w1); g.add(w2);
+marker.rotation.z = Math.PI; 
+
+g.add(marker);
+
 
 return g;
 
@@ -1204,11 +1196,9 @@ if (!gameActive) return;
 
 requestAnimationFrame(animate);
 
-
 let trailingZ = -Infinity;
 
 players.forEach(p => { if(p.mesh.position.z > trailingZ) trailingZ = p.mesh.position.z; });
-
 
 roads.forEach(r => {
 
@@ -1224,9 +1214,7 @@ r.position.z = frontZ - ROAD_LENGTH;
 
 });
 
-
 players.forEach(p => p.update());
-
 
 const width = window.innerWidth;
 
@@ -1234,14 +1222,11 @@ const height = window.innerHeight;
 
 renderer.setSize(width, height);
 
-
 let n = players.length;
 
 if (currentMode === 'STORY') n = 1; 
 
-
 const stripWidth = width / n;
-
 
 players.forEach((p, i) => {
 
@@ -1264,45 +1249,23 @@ renderer.render(scene, p.camera);
 }
 
 
-// --- COUNTDOWN & STATE ---
+// --- GAME LOGIC ---
 
 function startCountdown() {
 
-isCountingDown = true;
+isCountingDown = true; raceStartTime = null;
 
-raceStartTime = null;
-
-const layer = document.getElementById('countdown-layer');
-
-layer.classList.remove('hide');
-
-layer.innerHTML = '';
+const layer = document.getElementById('countdown-layer'); layer.classList.remove('hide'); layer.innerHTML = '';
 
 let count = 3;
 
 function showNumber() {
 
-if (count > 0) {
+if (count > 0) { layer.innerHTML = `<div class="countdown-text" style="color:red">${count}</div>`; count--; setTimeout(showNumber, 1000); }
 
-layer.innerHTML = `<div class="countdown-text" style="color:red">${count}</div>`;
+else if (count === 0) { layer.innerHTML = `<div class="countdown-text" style="color:#00ff66">GO!</div>`; raceStartTime = Date.now(); count--; setTimeout(showNumber, 1000); }
 
-count--; setTimeout(showNumber, 1000);
-
-} else if (count === 0) {
-
-layer.innerHTML = `<div class="countdown-text" style="color:#00ff66">GO!</div>`;
-
-raceStartTime = Date.now();
-
-count--; setTimeout(showNumber, 1000);
-
-} else {
-
-layer.classList.add('hide');
-
-isCountingDown = false;
-
-}
+else { layer.classList.add('hide'); isCountingDown = false; }
 
 }
 
@@ -1313,9 +1276,13 @@ showNumber();
 
 function checkAllFinished() {
 
-if (players.every(p => p.finished || p.hasQuit)) {
+// Di Story mode, finish logic dihandle finishStoryModeNow.
 
-setTimeout(showGameOver, 2000);
+// Di Versus mode, tunggu semua finish.
+
+if (currentMode !== 'STORY') {
+
+if (players.every(p => p.finished || p.hasQuit)) setTimeout(showGameOver, 2000);
 
 }
 
@@ -1324,7 +1291,57 @@ setTimeout(showGameOver, 2000);
 
 // --- MENU LOGIC ---
 
-window.startStoryLevel = function(levelId) {
+window.goToMainMenu = () => { gameActive = false; toggleScreen('main-menu'); };
+
+window.showStoryMenu = () => {
+
+toggleScreen('story-menu');
+
+document.getElementById('story-points').innerText = `Total Poin Musim: ${globalSeasonPoints}`;
+
+const cont = document.getElementById('level-container');
+
+cont.innerHTML = '';
+
+STORY_LEVELS.forEach(lvl => {
+
+const div = document.createElement('div');
+
+div.className = `level-card ${lvl.locked ? '' : 'unlocked'}`;
+
+// Tampilkan Background di Kartu Level
+
+div.style.backgroundImage = `url('${BACKGROUNDS[lvl.bgIdx].url}')`;
+
+div.innerHTML = `
+
+<div class="level-card-overlay">
+
+<div class="lvl-title">${lvl.name}</div>
+
+<div class="lvl-desc">${lvl.laps} Laps</div>
+
+${lvl.locked ? '<div style="color:red; margin-top:5px; font-weight:bold;">LOCKED</div>' : ''}
+
+</div>
+
+`;
+
+if(!lvl.locked) div.onclick = () => startStoryLevel(lvl.id);
+
+cont.appendChild(div);
+
+});
+
+};
+
+window.showVersusMenu = () => { toggleScreen('versus-menu'); setPlayers(2); setLaps(3); };
+
+window.setPlayers = (n) => { setupData.playerCount = n; updateBtnGroup('player-select', n + ' Player'); };
+
+window.setLaps = (n) => { setupData.laps = n; updateBtnGroup('lap-select', n + ' Lap'); };
+
+window.startStoryLevel = (levelId) => {
 
 const lvl = STORY_LEVELS.find(l => l.id === levelId);
 
@@ -1332,24 +1349,90 @@ if (lvl.locked) return;
 
 currentMode = 'STORY';
 
-setupData = { playerCount: 1, laps: lvl.laps, aiSpeed: lvl.aiSpeed };
+setupData = { playerCount: 1, laps: lvl.laps, aiSpeed: lvl.aiSpeed, bgUrl: BACKGROUNDS[lvl.bgIdx].url, bikeId: 0 };
+
+showBikeSelect();
+
+};
+
+
+window.showTrackSelect = () => {
+
+toggleScreen('track-select-menu');
+
+const cont = document.getElementById('track-container');
+
+cont.innerHTML = '';
+
+BACKGROUNDS.forEach(bg => {
+
+const div = document.createElement('div');
+
+div.className = 'card-item';
+
+div.innerHTML = `<img src="${bg.url}"><div class="card-title">${bg.name}</div>`;
+
+div.onclick = () => {
+
+setupData.bgUrl = bg.url;
+
+showBikeSelect();
+
+};
+
+cont.appendChild(div);
+
+});
+
+};
+
+
+window.showBikeSelect = () => {
+
+toggleScreen('bike-select-menu');
+
+const cont = document.getElementById('bike-container');
+
+cont.innerHTML = '';
+
+BIKES.forEach(b => {
+
+const div = document.createElement('div');
+
+div.className = `card-item ${setupData.bikeId === b.id ? 'selected' : ''}`;
+
+div.innerHTML = `<img src="${b.thumb}"><div class="card-title">${b.name}</div>`;
+
+div.onclick = () => {
+
+setupData.bikeId = b.id;
+
+Array.from(cont.children).forEach(c => c.classList.remove('selected'));
+
+div.classList.add('selected');
+
+};
+
+cont.appendChild(div);
+
+});
+
+};
+
+
+window.confirmStartGame = () => {
 
 startGame();
 
-}
-
-window.startVersus = function() { currentMode = 'VERSUS'; startGame(); }
+};
 
 
-window.quitGame = function(playerId) {
+window.quitGame = (playerId) => { if(players[playerId]) players[playerId].quitRace(); };
 
-if(players[playerId]) {
 
-players[playerId].quitRace();
+function toggleScreen(id) { document.querySelectorAll('.screen').forEach(el => el.classList.add('hide')); document.getElementById(id).classList.remove('hide'); }
 
-}
-
-}
+function updateBtnGroup(id, txt) { document.getElementById(id).querySelectorAll('button').forEach(b => { if(b.innerText.includes(txt)) b.classList.add('active'); else b.classList.remove('active'); }); }
 
 
 function startGame() {
@@ -1360,15 +1443,11 @@ document.getElementById('game-ui').classList.remove('hide');
 
 initScene();
 
-players = [];
-
-finishOrder = []; 
+players = []; finishOrder = []; 
 
 const uiContainer = document.getElementById('game-ui');
 
-uiContainer.innerHTML = '';
-
-uiContainer.className = '';
+uiContainer.innerHTML = ''; uiContainer.className = '';
 
 let uiCount = (currentMode === 'STORY') ? 1 : setupData.playerCount;
 
@@ -1377,31 +1456,40 @@ let totalBikes = (currentMode === 'STORY') ? 5 : setupData.playerCount;
 uiContainer.classList.add(`grid-${uiCount}`);
 
 
+// Create Human Players
+
 for (let i = 0; i < uiCount; i++) {
 
 let startOffset = i - (totalBikes - 1) / 2;
 
-let p = new Player(i, COLORS[i], false, startOffset);
+let chosenBikeUrl;
 
-players.push(p);
+if(currentMode === 'VERSUS') {
 
-scene.add(p.mesh);
+let bikeIndex = i % BIKES.length; 
 
+chosenBikeUrl = BIKES[bikeIndex].tex;
 
-let markersHTML = `<div id="marker-p${i}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[i].toString(16)}; z-index:2; border:1px solid white;"></div>`;
+} else {
 
-for(let j=0; j<totalBikes; j++) {
-
-if(j!==i) markersHTML += `<div id="marker-p${j}-in-p${i}" class="minimap-marker" style="background: white; width:12px; left:-1px;"></div>`;
+chosenBikeUrl = BIKES[setupData.bikeId].tex;
 
 }
 
 
+let p = new Player(i, COLORS[i], false, startOffset, chosenBikeUrl);
+
+players.push(p); scene.add(p.mesh);
+
+
+let markersHTML = `<div id="marker-p${i}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[i].toString(16)}; z-index:2; border:1px solid white;"></div>`;
+
+for(let j=0; j<totalBikes; j++) { if(j!==i) markersHTML += `<div id="marker-p${j}-in-p${i}" class="minimap-marker" style="background: white; width:12px; left:-1px;"></div>`; }
+
+
 const panel = document.createElement('div');
 
-panel.className = `player-panel`;
-
-panel.id = `panel-p${i}`;
+panel.className = `player-panel`; panel.id = `panel-p${i}`;
 
 panel.innerHTML = `
 
@@ -1441,22 +1529,18 @@ panel.innerHTML = `
 
 <div class="math-question">Ready?</div>
 
-<div class="math-options">
-
-<button class="math-btn">A</button><button class="math-btn">B</button><button class="math-btn">C</button>
-
-</div>
+<div class="math-options"><button class="math-btn">A</button><button class="math-btn">B</button><button class="math-btn">C</button></div>
 
 </div>
 
 `;
 
-uiContainer.appendChild(panel);
-
-p.generateMath();
+uiContainer.appendChild(panel); p.generateMath();
 
 }
 
+
+// Create AI
 
 if (currentMode === 'STORY') {
 
@@ -1464,11 +1548,11 @@ for(let j=1; j<=4; j++) {
 
 let startOffset = j - (totalBikes - 1) / 2;
 
-let ai = new Player(j, COLORS[j], true, startOffset);
+let aiBikeId = (setupData.bikeId + j) % 5; 
 
-players.push(ai);
+let ai = new Player(j, COLORS[j], true, startOffset, BIKES[aiBikeId].tex);
 
-scene.add(ai.mesh);
+players.push(ai); scene.add(ai.mesh);
 
 let aiMarker = document.getElementById(`marker-p${j}-in-p0`);
 
@@ -1479,179 +1563,89 @@ if(aiMarker) aiMarker.style.background = '#' + COLORS[j].toString(16);
 }
 
 
-gameActive = true;
-
-animate();
-
-startCountdown();
+gameActive = true; animate(); startCountdown();
 
 }
 
 
 function showGameOver() {
 
-gameActive = false;
+gameActive = false; document.getElementById('game-ui').classList.add('hide');
 
-document.getElementById('game-ui').classList.add('hide');
-
-const goScreen = document.getElementById('game-over');
-
-goScreen.classList.remove('hide');
+const goScreen = document.getElementById('game-over'); goScreen.classList.remove('hide');
 
 const sb = document.getElementById('score-board');
 
-sb.innerHTML = `
+sb.innerHTML = `<div class="score-row score-header"><span>Pos</span><span>Pembalap</span><span>Waktu & Poin</span></div>`;
 
-<div class="score-row score-header">
+// Sort players: Finished first (by finishTime), then unfinished (by distance)
 
-<span>Pos</span>
+let allPlayers = [...players];
 
-<span>Pembalap</span>
+allPlayers.sort((a, b) => {
 
-<span>Waktu & Poin</span>
+if (a.finished && b.finished) return a.finishTime - b.finishTime;
 
-</div>
+if (a.finished) return -1;
 
-`;
+if (b.finished) return 1;
 
-
-let rankedPlayers = [...finishOrder];
-
-players.forEach(p => {
-
-if (!finishOrder.includes(p)) {
-
-rankedPlayers.push(p);
-
-}
+return b.distance - a.distance;
 
 });
 
 
-rankedPlayers.forEach((p, idx) => {
+allPlayers.forEach((p, idx) => {
 
 let name = p.isAI ? `CPU Opponent ${p.id}` : `Player ${p.id+1}`;
 
-let timeStr = p.finished ? formatTime(p.finishTime) : "DNF (Gave Up)";
+let timeStr = p.finished ? formatTime(p.finishTime) : "DNF";
 
 let points = (p.finished && idx < POINTS_SYSTEM.length) ? POINTS_SYSTEM[idx] : 0;
 
-if (currentMode === 'STORY' && !p.isAI) {
+if (currentMode === 'STORY' && !p.isAI) globalSeasonPoints += points;
 
-globalSeasonPoints += points;
-
-}
-
-
-let row = document.createElement('div');
-
-row.className = 'score-row';
+let row = document.createElement('div'); row.className = 'score-row';
 
 if(p.id === 0 && currentMode === 'STORY') row.style.border = "2px solid #00eaff"; 
 
-
-row.innerHTML = `
-
-<span style="color:${'#'+p.color.toString(16)}">#${idx+1}</span> 
-
-<span>${name}</span> 
-
-<span>${timeStr} <b style="color:#ffd700">(+${points} Pts)</b></span>
-
-`;
+row.innerHTML = `<span style="color:${'#'+p.color.toString(16)}">#${idx+1}</span><span>${name}</span><span>${timeStr} <b style="color:#ffd700">(+${points} Pts)</b></span>`;
 
 sb.appendChild(row);
 
 });
 
-
 if (currentMode === 'STORY') {
 
-let playerRank = rankedPlayers.findIndex(p => p.id === 0);
+// Cari posisi pemain manusia di array yang sudah diurutkan
 
-if (playerRank !== -1 && playerRank < 3 && rankedPlayers[playerRank].finished) {
+let playerRank = allPlayers.findIndex(p => p.id === 0);
 
-unlockNextLevel();
+if (playerRank !== -1 && playerRank < 3 && allPlayers[playerRank].finished) {
 
-let msg = document.createElement('div');
-
-msg.innerHTML = `<h3 style="color:#00ff66">SELAMAT! LEVEL BERIKUTNYA TERBUKA</h3>`;
-
-sb.appendChild(msg);
+unlockNextLevel(); sb.appendChild(createMsg(`<h3 style="color:#00ff66">SELAMAT! LEVEL BERIKUTNYA TERBUKA</h3>`));
 
 } else {
 
-let msg = document.createElement('div');
-
-msg.innerHTML = `<h3 style="color:#ff3333">GAGAL PODIUM. COBA LAGI!</h3>`;
-
-sb.appendChild(msg);
+sb.appendChild(createMsg(`<h3 style="color:#ff3333">GAGAL PODIUM. COBA LAGI!</h3>`));
 
 }
 
-let totalDiv = document.createElement('div');
-
-totalDiv.innerHTML = `<h2 style="margin-top:20px; color:#ffd700">TOTAL POIN MUSIM: ${globalSeasonPoints}</h2>`;
-
-sb.appendChild(totalDiv);
+sb.appendChild(createMsg(`<h2 style="margin-top:20px; color:#ffd700">TOTAL POIN MUSIM: ${globalSeasonPoints}</h2>`));
 
 }
 
 }
 
+function createMsg(html) { const d = document.createElement('div'); d.innerHTML = html; return d; }
 
 function unlockNextLevel() {
 
-let currentLvlObj = STORY_LEVELS.find(l => l.laps === setupData.laps && l.aiSpeed === setupData.aiSpeed);
+let lvl = STORY_LEVELS.find(l => l.laps === setupData.laps && l.aiSpeed === setupData.aiSpeed);
 
-if (currentLvlObj) {
-
-let nextIdx = STORY_LEVELS.indexOf(currentLvlObj) + 1;
-
-if (nextIdx < STORY_LEVELS.length) STORY_LEVELS[nextIdx].locked = false;
+if (lvl) { let idx = STORY_LEVELS.indexOf(lvl) + 1; if (idx < STORY_LEVELS.length) STORY_LEVELS[idx].locked = false; }
 
 }
-
-}
-
-
-window.goToMainMenu = () => { gameActive = false; toggleScreen('main-menu'); };
-
-window.showStoryMenu = () => {
-
-toggleScreen('story-menu');
-
-document.getElementById('story-points').innerText = `Total Poin Musim: ${globalSeasonPoints}`;
-
-const cont = document.getElementById('level-container');
-
-cont.innerHTML = '';
-
-STORY_LEVELS.forEach(lvl => {
-
-const div = document.createElement('div');
-
-div.className = `level-card ${lvl.locked ? '' : 'unlocked'}`;
-
-div.innerHTML = `<h3>${lvl.name}</h3><p>${lvl.laps} Laps</p>`;
-
-if(!lvl.locked) div.onclick = () => startStoryLevel(lvl.id);
-
-cont.appendChild(div);
-
-});
-
-};
-
-window.showVersusMenu = () => { toggleScreen('versus-menu'); setPlayers(2); setLaps(3); };
-
-window.setPlayers = (n) => { setupData.playerCount = n; updateBtnGroup('player-select', n + ' Player'); };
-
-window.setLaps = (n) => { setupData.laps = n; updateBtnGroup('lap-select', n + ' Lap'); };
-
-function toggleScreen(id) { document.querySelectorAll('.screen').forEach(el => el.classList.add('hide')); document.getElementById(id).classList.remove('hide'); }
-
-function updateBtnGroup(id, txt) { document.getElementById(id).querySelectorAll('button').forEach(b => { if(b.innerText.includes(txt)) b.classList.add('active'); else b.classList.remove('active'); }); }
 
 </script>
 
