@@ -1,1909 +1,1104 @@
 <!DOCTYPE html>
-
 <html lang="id">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Komandan Turbo : Misi Penjumlahan</title>
-
-<!-- FontAwesome untuk Ikon Sosmed -->
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<style>
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
-
-
-body {
-
-margin: 0;
-
-overflow: hidden;
-
-font-family: 'Orbitron', sans-serif;
-
-background-color: #050510;
-
-color: white;
-
-user-select: none;
-
-touch-action: none;
-
-}
-
-
-#game-container { position: relative; width: 100vw; height: 100vh; }
-
-canvas { display: block; width: 100%; height: 100%; }
-
-
-/* UI OVERLAYS */
-
-.screen {
-
-position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-
-background: url('https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backkt0.png') no-repeat center center;
-
-background-size: cover;
-
-z-index: 100;
-
-display: flex; flex-direction: column; justify-content: center; align-items: center;
-
-transition: opacity 0.5s;
-
-}
-
-.screen::before {
-
-content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-
-background: rgba(0,0,0,0.75); z-index: -1;
-
-}
-
-
-.hide { display: none !important; }
-
-
-/* TYPOGRAPHY */
-
-h1 { color: #00eaff; font-size: 5vmin; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
-
-h2 { color: #fff; font-size: 3vmin; margin-bottom: 20px; text-shadow: 0 0 10px black; text-align: center; }
-
-p { color: #eee; max-width: 80%; text-align: center; font-size: 2vmin; line-height: 1.5; margin-bottom: 20px; text-shadow: 1px 1px 2px black;}
-
-
-/* FOOTER KREDIT */
-
-.footer-credit {
-
-position: absolute; bottom: 20px; width: 100%; text-align: center;
-
-z-index: 10;
-
-}
-
-.credit-text {
-
-color: #aaa; font-size: 1.8vmin; margin-bottom: 10px; letter-spacing: 1px;
-
-text-shadow: 1px 1px 2px black;
-
-}
-
-.social-icons {
-
-display: flex; justify-content: center; gap: 25px;
-
-}
-
-.social-icons a {
-
-color: #fff; font-size: 3.5vmin; transition: 0.3s;
-
-filter: drop-shadow(0 0 5px rgba(0,0,0,0.8));
-
-}
-
-.social-icons a:hover {
-
-color: #00eaff; transform: scale(1.2) translateY(-5px);
-
-filter: drop-shadow(0 0 15px #00eaff);
-
-}
-
-
-/* BUTTONS */
-
-.btn-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; margin-bottom: 20px; }
-
-.action-btn {
-
-padding: 1.5vmin 4vmin; font-size: 2vmin;
-
-background: linear-gradient(180deg, rgba(0, 40, 80, 0.8), rgba(0, 10, 20, 0.9)); 
-
-color: #00eaff;
-
-border: 2px solid #00eaff; border-radius: 12px;
-
-font-family: 'Orbitron', sans-serif; font-weight: bold;
-
-cursor: pointer; transition: all 0.2s; text-transform: uppercase;
-
-box-shadow: 0 0 15px rgba(0, 234, 255, 0.2);
-
-min-width: 140px;
-
-}
-
-.action-btn:hover, .action-btn.active {
-
-background: #00eaff; color: #000; box-shadow: 0 0 30px #00eaff; transform: scale(1.05);
-
-}
-
-.action-btn:active { transform: scale(0.95); }
-
-.action-btn:disabled { border-color: #555; color: #555; background: #222; cursor: not-allowed; box-shadow: none; transform: none; }
-
-
-/* SPLASH START BUTTON */
-
-.start-btn-large {
-
-font-size: 5vmin; padding: 2vmin 8vmin;
-
-background: linear-gradient(45deg, #00eaff, #008cff);
-
-color: white; border: none; border-radius: 50px;
-
-box-shadow: 0 0 40px rgba(0, 234, 255, 0.5);
-
-animation: pulseBtn 2s infinite; margin-top: 30px; margin-bottom: 80px; /* Jarak untuk footer */
-
-}
-
-
-/* LOADING */
-
-#loading-screen { background: #000; z-index: 200; }
-
-.loader-bar { width: 60%; max-width: 400px; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; overflow: hidden; position: relative; }
-
-.loader-fill { height: 100%; width: 0%; background: #00eaff; box-shadow: 0 0 10px #00eaff; transition: width 0.2s; }
-
-.loading-text { font-size: 2.5vmin; color: #00eaff; animation: blink 1s infinite; text-align: center; }
-
-
-/* SELECTION GRIDS */
-
-.selection-grid {
-
-display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
-
-width: 100%; max-height: 60vh; overflow-y: auto; padding: 10px;
-
-scrollbar-width: thin; scrollbar-color: #00eaff #111;
-
-}
-
-.card-item {
-
-background: rgba(0,0,0,0.8); border: 2px solid #444; padding: 10px;
-
-border-radius: 15px; width: 160px; text-align: center; cursor: pointer;
-
-transition: 0.3s; display: flex; flex-direction: column; align-items: center;
-
-box-shadow: 0 5px 15px rgba(0,0,0,0.5); position: relative;
-
-}
-
-.card-item:hover { transform: translateY(-5px); border-color: #fff; background: rgba(255,255,255,0.1); }
-
-.card-item.selected { border-color: #00eaff; box-shadow: 0 0 25px rgba(0,234,255,0.6); background: rgba(0, 234, 255, 0.2); transform: scale(1.05); }
-
-.card-item.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(100%); border-color: #333; }
-
-.card-item img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px; object-fit: cover; aspect-ratio: 16/9; }
-
-.card-title { font-size: 1.8vmin; margin-bottom: 5px; color: #fff; font-weight: bold; }
-
-.owner-badge {
-
-position: absolute; top: 5px; right: 5px; 
-
-background: #00eaff; color: black; font-weight: bold; padding: 2px 6px;
-
-border-radius: 4px; font-size: 1.2vmin;
-
-}
-
-
-/* VERSUS SETUP SECTION STYLES */
-
-.setup-section {
-
-background: rgba(0, 0, 0, 0.6);
-
-padding: 20px; border-radius: 15px; width: 90%; max-width: 700px;
-
-margin-bottom: 20px; border: 1px solid rgba(0, 234, 255, 0.3);
-
-backdrop-filter: blur(5px);
-
-}
-
-.setup-section h3 { margin-top: 0; color: #00eaff; font-size: 2.5vmin; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; text-align: center;}
-
-
-.option-card {
-
-background: rgba(255, 255, 255, 0.05); border: 2px solid #444;
-
-border-radius: 10px; padding: 15px 25px; cursor: pointer;
-
-transition: 0.2s; min-width: 100px; text-align: center;
-
-font-size: 2vmin; font-weight: bold; color: #ccc;
-
-}
-
-.option-card:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
-
-.option-card.active { 
-
-background: #00eaff; color: #000; border-color: #00eaff; 
-
-box-shadow: 0 0 20px #00eaff; transform: scale(1.1); z-index: 2;
-
-}
-
-
-/* LEVEL CARDS */
-
-.level-card {
-
-background-color: rgba(0,0,0,0.8);
-
-background-size: cover; background-position: center;
-
-border: 2px solid #444; padding: 0; margin: 15px;
-
-border-radius: 15px; width: 220px; height: 140px;
-
-text-align: center; cursor: pointer; position: relative; overflow: hidden;
-
-opacity: 0.6; pointer-events: none; transition: 0.3s;
-
-box-shadow: 0 5px 15px black;
-
-}
-
-.level-card-overlay {
-
-background: rgba(0,0,0,0.7); width: 100%; height: 100%;
-
-display: flex; flex-direction: column; justify-content: center; align-items: center;
-
-transition: 0.3s;
-
-}
-
-.level-card.unlocked { opacity: 1; pointer-events: auto; border-color: #00eaff; }
-
-.level-card.unlocked .level-card-overlay { background: rgba(0,0,0,0.4); }
-
-.level-card:hover { transform: scale(1.05); border-color: #fff; box-shadow: 0 0 20px #00eaff; }
-
-.level-card:hover .level-card-overlay { background: rgba(0,0,0,0.2); }
-
-.lvl-title { font-size: 2.5vmin; color: #fff; text-shadow: 0 2px 4px black; font-weight: bold; }
-
-.lvl-desc { font-size: 1.5vmin; color: #00eaff; text-shadow: 0 1px 2px black; margin-top: 5px; }
-
-
-/* IN-GAME UI LAYOUTS - VERTIKAL SPLIT FIX */
-
-#game-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: grid; }
-
-/* Semua layout versus sekarang vertikal (kolom) */
-
-.grid-1 { grid-template-columns: 1fr; }
-
-.grid-2 { grid-template-columns: 1fr 1fr; } 
-
-.grid-3 { grid-template-columns: 1fr 1fr 1fr; } 
-
-.grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; } /* 4 Kolom Vertikal */
-
-
-.player-panel {
-
-position: relative; border: 2px solid rgba(255,255,255,0.1);
-
-box-sizing: border-box; pointer-events: none; overflow: hidden;
-
-display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;
-
-}
-
-.p-color-bar { position: absolute; top: 0; left: 0; width: 100%; height: 5px; z-index: 5; }
-
-
-.hud-top { 
-
-position: absolute; top: 10px; left: 10px; right: 10px; 
-
-display: flex; justify-content: space-between; align-items: flex-start; 
-
-}
-
-.hud-info-box { 
-
-background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 8px; 
-
-font-size: 1.8vmin; text-align: left; border: 1px solid rgba(255,255,255,0.2); 
-
-backdrop-filter: blur(4px);
-
-}
-
-.speed-box { text-align: right; font-size: 2.5vmin; color: #fff; text-shadow: 0 0 10px currentColor; font-weight: bold; }
-
-.timer-display { font-family: monospace; font-size: 2vmin; color: #ffd700; margin-top: 5px; }
-
-.quit-btn { 
-
-pointer-events: auto; background: rgba(220, 20, 60, 0.8); color: white; 
-
-border: 1px solid #ff4444; border-radius: 8px; padding: 5px 15px; 
-
-font-size: 1.8vmin; cursor: pointer; margin-left: 10px; font-family: 'Orbitron', sans-serif; font-weight: bold;
-
-transition: 0.2s;
-
-}
-
-.quit-btn:hover { background: red; box-shadow: 0 0 10px red; }
-
-
-.minimap-container { position: relative; width: 15px; height: 80px; background: rgba(255,255,255,0.1); border: 1px solid #777; border-radius: 8px; margin-left: 10px; overflow: hidden; }
-
-.minimap-marker { position: absolute; left: 0; width: 100%; height: 4px; background: red; transition: bottom 0.2s linear; box-shadow: 0 0 4px black; z-index: 2; }
-
-
-/* MATH PANEL */
-
-.math-box {
-
-pointer-events: auto; background: rgba(0, 0, 0, 0.9); border: 2px solid #fff; border-radius: 15px; padding: 10px;
-
-text-align: center; width: 95%; max-width: 400px; margin: 0 auto 10px auto; align-self: center; z-index: 20; 
-
-box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-
-transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
-
-}
-
-.anim-correct { border-color: #00ff66 !important; background-color: rgba(0, 255, 102, 0.2) !important; animation: popCorrect 0.3s ease-out; }
-
-.anim-wrong { border-color: #ff3333 !important; background-color: rgba(255, 51, 51, 0.2) !important; animation: shakeWrong 0.4s ease-in-out; }
-
-.math-question { font-size: 3.5vmin; margin-bottom: 10px; color: #fff; font-weight: bold; letter-spacing: 2px; }
-
-.math-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
-
-@media (max-width: 600px) { .math-options { grid-template-columns: 1fr; } }
-
-
-.math-btn { 
-
-background: linear-gradient(180deg, #333, #111); border: 1px solid #555; color: white; 
-
-padding: 10px; font-size: 2.2vmin; font-family: 'Orbitron', sans-serif; 
-
-cursor: pointer; border-radius: 8px; transition: background 0.1s; 
-
-}
-
-.math-btn:hover { background: #444; border-color: #00eaff; }
-
-.math-btn:active { background: #fff; color: #000; transform: scale(0.95); }
-
-
-.feedback-overlay { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 6vmin; font-weight: bold; opacity: 0; transition: opacity 0.3s; text-shadow: 3px 3px 0 #000; white-space: nowrap; z-index: 30; pointer-events: none; }
-
-.lap-popup { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 8vmin; font-weight: bold; color: #ffd700; text-shadow: 0 0 20px #ffaa00, 3px 3px 8px black; transition: transform 0.5s, opacity 0.5s; opacity: 0; z-index: 50; pointer-events: none; white-space: nowrap; }
-
-.lap-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-
-.finish-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10vmin; font-weight: bold; color: #00eaff; text-shadow: 0 0 30px #00eaff, 3px 3px 10px black; display: none; z-index: 60; animation: pulseBtn 1s infinite; }
-
-
-#countdown-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 50; background: rgba(0,0,0,0.3); }
-
-.countdown-text { font-size: 25vmin; font-weight: bold; color: #fff; animation: zoomPop 0.8s ease-out; text-shadow: 0 0 20px currentColor; }
-
-#game-over { background: rgba(0,0,0,0.95); overflow-y: auto; }
-
-#score-board { margin: 20px 0; width: 90%; max-width: 800px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; border: 1px solid #333; }
-
-.score-row { display: grid; grid-template-columns: 0.5fr 2fr 1.5fr; padding: 15px; border-bottom: 1px solid #444; font-size: 2.5vmin; align-items: center; }
-
-.score-header { font-weight: bold; color: #00eaff; border-bottom: 3px solid #00eaff; font-size: 2.8vmin; }
-
-
-@keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); } 50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 234, 255, 0.8); } 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); } }
-
-@keyframes blink { 50% { opacity: 0.5; } }
-
-@keyframes popCorrect { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-@keyframes shakeWrong { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
-
-@keyframes zoomPop { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Komandan Turbo : Misi Penjumlahan</title>
+    <!-- FontAwesome untuk Ikon Sosmed -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            background-color: #050510;
+            color: white;
+            user-select: none;
+            touch-action: none;
+        }
+
+        #game-container { position: relative; width: 100vw; height: 100vh; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        /* UI OVERLAYS */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backkt0.png') no-repeat center center;
+            background-size: cover;
+            z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s;
+        }
+        .screen::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); z-index: -1;
+        }
+
+        .hide { display: none !important; }
+
+        /* TYPOGRAPHY */
+        h1 { color: #00eaff; font-size: 5vmin; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 5px; text-align: center; text-shadow: 0 0 20px #00eaff;}
+        h2 { color: #fff; font-size: 3vmin; margin-bottom: 20px; text-shadow: 0 0 10px black; text-align: center; }
+        p { color: #eee; max-width: 80%; text-align: center; font-size: 2vmin; line-height: 1.5; margin-bottom: 20px; text-shadow: 1px 1px 2px black;}
+
+        /* FOOTER KREDIT */
+        .footer-credit {
+            position: absolute; bottom: 20px; width: 100%; text-align: center;
+            z-index: 10;
+        }
+        .credit-text {
+            color: #aaa; font-size: 1.8vmin; margin-bottom: 10px; letter-spacing: 1px;
+            text-shadow: 1px 1px 2px black;
+        }
+        .social-icons {
+            display: flex; justify-content: center; gap: 25px;
+        }
+        .social-icons a {
+            color: #fff; font-size: 3.5vmin; transition: 0.3s;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.8));
+        }
+        .social-icons a:hover {
+            color: #00eaff; transform: scale(1.2) translateY(-5px);
+            filter: drop-shadow(0 0 15px #00eaff);
+        }
+
+        /* BUTTONS */
+        .btn-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; margin-bottom: 20px; }
+        
+        .action-btn {
+            padding: 1.5vmin 4vmin; font-size: 2vmin;
+            background: linear-gradient(180deg, rgba(0, 40, 80, 0.8), rgba(0, 10, 20, 0.9)); 
+            color: #00eaff;
+            border: 2px solid #00eaff; border-radius: 12px;
+            font-family: 'Orbitron', sans-serif; font-weight: bold;
+            cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2);
+            min-width: 140px;
+        }
+        .action-btn:hover, .action-btn.active {
+            background: #00eaff; color: #000; box-shadow: 0 0 30px #00eaff; transform: scale(1.05);
+        }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn:disabled { border-color: #555; color: #555; background: #222; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* SPLASH START BUTTON */
+        .start-btn-large {
+            font-size: 5vmin; padding: 2vmin 8vmin;
+            background: linear-gradient(45deg, #00eaff, #008cff);
+            color: white; border: none; border-radius: 50px;
+            box-shadow: 0 0 40px rgba(0, 234, 255, 0.5);
+            animation: pulseBtn 2s infinite; margin-top: 30px; margin-bottom: 80px; 
+        }
+
+        /* LOADING */
+        #loading-screen { background: #000; z-index: 200; }
+        .loader-bar { width: 60%; max-width: 400px; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; overflow: hidden; position: relative; }
+        .loader-fill { height: 100%; width: 0%; background: #00eaff; box-shadow: 0 0 10px #00eaff; transition: width 0.2s; }
+        .loading-text { font-size: 2.5vmin; color: #00eaff; animation: blink 1s infinite; text-align: center; }
+
+        /* SELECTION GRIDS */
+        .selection-grid {
+            display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+            width: 100%; max-height: 60vh; overflow-y: auto; padding: 10px;
+            scrollbar-width: thin; scrollbar-color: #00eaff #111;
+        }
+        
+        .card-item {
+            background: rgba(0,0,0,0.8); border: 2px solid #444; padding: 10px;
+            border-radius: 15px; width: 160px; text-align: center; cursor: pointer;
+            transition: 0.3s; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); position: relative;
+        }
+        .card-item:hover { transform: translateY(-5px); border-color: #fff; background: rgba(255,255,255,0.1); }
+        .card-item.selected { border-color: #00eaff; box-shadow: 0 0 25px rgba(0,234,255,0.6); background: rgba(0, 234, 255, 0.2); transform: scale(1.05); }
+        .card-item.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(100%); border-color: #333; }
+        .card-item img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px; object-fit: cover; aspect-ratio: 16/9; }
+        .card-title { font-size: 1.8vmin; margin-bottom: 5px; color: #fff; font-weight: bold; }
+        
+        .owner-badge {
+            position: absolute; top: 5px; right: 5px; 
+            background: #00eaff; color: black; font-weight: bold; padding: 2px 6px;
+            border-radius: 4px; font-size: 1.2vmin;
+        }
+
+        /* VERSUS SETUP */
+        .setup-section {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px; border-radius: 15px; width: 90%; max-width: 700px;
+            margin-bottom: 20px; border: 1px solid rgba(0, 234, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        .setup-section h3 { margin-top: 0; color: #00eaff; font-size: 2.5vmin; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; text-align: center;}
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.05); border: 2px solid #444;
+            border-radius: 10px; padding: 15px 25px; cursor: pointer;
+            transition: 0.2s; min-width: 100px; text-align: center;
+            font-size: 2vmin; font-weight: bold; color: #ccc;
+        }
+        .option-card:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
+        .option-card.active { 
+            background: #00eaff; color: #000; border-color: #00eaff; 
+            box-shadow: 0 0 20px #00eaff; transform: scale(1.1); z-index: 2;
+        }
+
+        /* LEVEL CARDS */
+        .level-card {
+            background-color: rgba(0,0,0,0.8);
+            background-size: cover; background-position: center;
+            border: 2px solid #444; padding: 0; margin: 15px;
+            border-radius: 15px; width: 220px; height: 140px;
+            text-align: center; cursor: pointer; position: relative; overflow: hidden;
+            opacity: 0.6; pointer-events: none; transition: 0.3s;
+            box-shadow: 0 5px 15px black;
+        }
+        .level-card-overlay {
+            background: rgba(0,0,0,0.7); width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: 0.3s;
+        }
+        .level-card.unlocked { opacity: 1; pointer-events: auto; border-color: #00eaff; }
+        .level-card.unlocked .level-card-overlay { background: rgba(0,0,0,0.4); }
+        .level-card:hover { transform: scale(1.05); border-color: #fff; box-shadow: 0 0 20px #00eaff; }
+        .level-card:hover .level-card-overlay { background: rgba(0,0,0,0.2); }
+        .lvl-title { font-size: 2.5vmin; color: #fff; text-shadow: 0 2px 4px black; font-weight: bold; }
+        .lvl-desc { font-size: 1.5vmin; color: #00eaff; text-shadow: 0 1px 2px black; margin-top: 5px; }
+
+        /* IN-GAME UI */
+        #game-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: grid; }
+        .grid-1 { grid-template-columns: 1fr; }
+        .grid-2 { grid-template-columns: 1fr 1fr; } 
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; } 
+        .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; } 
+
+        .player-panel {
+            position: relative; border: 2px solid rgba(255,255,255,0.1);
+            box-sizing: border-box; pointer-events: none; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;
+        }
+        .p-color-bar { position: absolute; top: 0; left: 0; width: 100%; height: 5px; z-index: 5; }
+
+        .hud-top { 
+            position: absolute; top: 10px; left: 10px; right: 10px; 
+            display: flex; justify-content: space-between; align-items: flex-start; 
+        }
+        .hud-left { display:flex; flex-direction: column; gap: 5px; }
+        
+        .hud-info-box { 
+            background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 8px; 
+            font-size: 1.8vmin; text-align: left; border: 1px solid rgba(255,255,255,0.2); 
+            backdrop-filter: blur(4px); margin-bottom: 5px;
+        }
+        .speed-box { text-align: right; font-size: 2.5vmin; color: #fff; text-shadow: 0 0 10px currentColor; font-weight: bold; }
+        .timer-display { font-family: monospace; font-size: 2vmin; color: #ffd700; margin-top: 5px; }
+        .rank-display { font-weight: bold; color: #00ff66; font-size: 2vmin; }
+        
+        .quit-btn { 
+            pointer-events: auto; background: rgba(220, 20, 60, 0.8); color: white; 
+            border: 1px solid #ff4444; border-radius: 8px; padding: 5px 15px; 
+            font-size: 1.8vmin; cursor: pointer; margin-left: 10px; font-family: 'Orbitron', sans-serif; font-weight: bold;
+            transition: 0.2s;
+        }
+        .quit-btn:hover { background: red; box-shadow: 0 0 10px red; }
+
+        .minimap-container { position: relative; width: 15px; height: 80px; background: rgba(255,255,255,0.1); border: 1px solid #777; border-radius: 8px; margin-left: 10px; overflow: hidden; }
+        .minimap-marker { position: absolute; left: 0; width: 100%; height: 4px; background: red; transition: bottom 0.2s linear; box-shadow: 0 0 4px black; z-index: 2; }
+
+        /* MATH PANEL */
+        .math-box {
+            pointer-events: auto; background: rgba(0, 0, 0, 0.9); border: 2px solid #fff; border-radius: 15px; padding: 10px;
+            text-align: center; width: 95%; max-width: 400px; margin: 0 auto 10px auto; align-self: center; z-index: 20; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: transform 0.1s, border-color 0.2s, background-color 0.2s;
+        }
+        .anim-correct { border-color: #00ff66 !important; background-color: rgba(0, 255, 102, 0.2) !important; animation: popCorrect 0.3s ease-out; }
+        .anim-wrong { border-color: #ff3333 !important; background-color: rgba(255, 51, 51, 0.2) !important; animation: shakeWrong 0.4s ease-in-out; }
+        
+        .math-question { font-size: 3.5vmin; margin-bottom: 10px; color: #fff; font-weight: bold; letter-spacing: 2px; }
+        .math-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+        @media (max-width: 600px) { .math-options { grid-template-columns: 1fr; } }
+
+        .math-btn { 
+            background: linear-gradient(180deg, #333, #111); border: 1px solid #555; color: white; 
+            padding: 10px; font-size: 2.2vmin; font-family: 'Orbitron', sans-serif; 
+            cursor: pointer; border-radius: 8px; transition: background 0.1s; 
+        }
+        .math-btn:hover { background: #444; border-color: #00eaff; }
+        .math-btn:active { background: #fff; color: #000; transform: scale(0.95); }
+
+        .feedback-overlay { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 6vmin; font-weight: bold; opacity: 0; transition: opacity 0.3s; text-shadow: 3px 3px 0 #000; white-space: nowrap; z-index: 30; pointer-events: none; }
+        .lap-popup { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 8vmin; font-weight: bold; color: #ffd700; text-shadow: 0 0 20px #ffaa00, 3px 3px 8px black; transition: transform 0.5s, opacity 0.5s; opacity: 0; z-index: 50; pointer-events: none; white-space: nowrap; }
+        .lap-popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .finish-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10vmin; font-weight: bold; color: #00eaff; text-shadow: 0 0 30px #00eaff, 3px 3px 10px black; display: none; z-index: 60; animation: pulseBtn 1s infinite; }
+
+        #countdown-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 50; background: rgba(0,0,0,0.3); }
+        .countdown-text { font-size: 25vmin; font-weight: bold; color: #fff; animation: zoomPop 0.8s ease-out; text-shadow: 0 0 20px currentColor; }
+        
+        #game-over { background: rgba(0,0,0,0.95); overflow-y: auto; }
+        #score-board { margin: 20px 0; width: 90%; max-width: 800px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        .score-row { display: grid; grid-template-columns: 0.5fr 2fr 1.5fr; padding: 15px; border-bottom: 1px solid #444; font-size: 2.5vmin; align-items: center; }
+        .score-header { font-weight: bold; color: #00eaff; border-bottom: 3px solid #00eaff; font-size: 2.8vmin; }
+
+        @keyframes pulseBtn { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); } 50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 234, 255, 0.8); } 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 234, 255, 0.5); } }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        @keyframes popCorrect { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes shakeWrong { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+        @keyframes zoomPop { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+    </style>
 </head>
-
 <body>
-
-<div id="game-container"></div>
-
-
-<!-- LOADING SCREEN -->
-
-<div id="loading-screen" class="screen">
-
-<h2 class="loading-text">MENGAMBIL DATA PEMBALAP DAN SIRKUIT...</h2>
-
-<div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
-
-</div>
-
-
-<!-- SPLASH SCREEN -->
-
-<div id="splash-screen" class="screen hide">
-
-<h1 style="font-size: 6vmin; margin-bottom: 5px;">KOMANDAN TURBO</h1>
-
-<h2 style="color:#00eaff; font-size: 3vmin; letter-spacing: 5px;">MISI PENJUMLAHAN</h2>
-
-<p style="margin-top: 50px;">SIAPKAN LOGIKA & KECEPATANMU</p>
-
-<button class="action-btn start-btn-large" onclick="enterMainMenu()">START</button>
-
-
-<div class="footer-credit">
-
-<div class="credit-text">Game Design by @herisheroes 2026</div>
-
-<div class="social-icons">
-
-<a href="https://www.youtube.com/@herisheroes" target="_blank"><i class="fab fa-youtube"></i></a>
-
-<a href="https://www.tiktok.com/@herisheroes" target="_blank"><i class="fab fa-tiktok"></i></a>
-
-<a href="https://www.instagram.com/herisheroes" target="_blank"><i class="fab fa-instagram"></i></a>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- MAIN MENU -->
-
-<div id="main-menu" class="screen hide">
-
-<h1>MAIN MENU</h1>
-
-<div class="btn-group">
-
-<button class="action-btn" onclick="showStoryMenu()">Story Mode</button>
-
-<button class="action-btn" onclick="showVersusMenu()">Versus Mode</button>
-
-</div>
-
-</div>
-
-
-<!-- STORY MODE: LEVEL SELECT -->
-
-<div id="story-menu" class="screen hide">
-
-<h1>Story Mode</h1>
-
-<h2>Pilih Level</h2>
-
-<div id="story-points" style="color: #ffd700; margin-bottom: 20px; font-size: 3vmin; text-shadow: 2px 2px 0 black; font-weight: bold;">Total Poin Musim: 0</div>
-
-<div id="level-container" class="btn-group" style="width:100%; max-width:1000px;"></div>
-
-<button class="action-btn" style="margin-top: 30px;" onclick="goToMainMenu()">Kembali</button>
-
-</div>
-
-
-<!-- VERSUS: SETUP -->
-
-<div id="versus-menu" class="screen hide">
-
-<h1>Versus Mode</h1>
-
-<div class="setup-section">
-
-<h3>JUMLAH PEMAIN</h3>
-
-<div class="btn-group" id="player-select">
-
-<button class="option-card" onclick="setPlayers(2)">2 Player</button>
-
-<button class="option-card" onclick="setPlayers(3)">3 Player</button>
-
-<button class="option-card" onclick="setPlayers(4)">4 Player</button>
-
-</div>
-
-</div>
-
-<div class="setup-section">
-
-<h3>JUMLAH LAP</h3>
-
-<div class="btn-group" id="lap-select">
-
-<button class="option-card" onclick="setLaps(1)">1 Lap</button>
-
-<button class="option-card" onclick="setLaps(3)">3 Lap</button>
-
-<button class="option-card" onclick="setLaps(5)">5 Lap</button>
-
-</div>
-
-</div>
-
-
-<button class="action-btn" style="margin-top: 20px; min-width: 200px; background: #00eaff; color: #000;" onclick="showTrackSelect()">LANJUT</button>
-
-<button class="action-btn" style="margin-top: 10px; background: transparent; border: none; color: #ccc;" onclick="goToMainMenu()">Kembali</button>
-
-</div>
-
-
-<!-- SELECT TRACK (VERSUS) -->
-
-<div id="track-select-menu" class="screen hide">
-
-<h1>Pilih Lokasi Balap</h1>
-
-<div id="track-container" class="selection-grid"></div>
-
-<button class="action-btn" style="margin-top: 20px;" onclick="showVersusMenu()">Kembali</button>
-
-</div>
-
-
-<!-- SELECT BIKE (GLOBAL & VERSUS TURN BASED) -->
-
-<div id="bike-select-menu" class="screen hide">
-
-<h1 id="bike-select-title">Pilih Motor</h1>
-
-<p id="bike-select-desc">Pilih kendaraan andalanmu!</p>
-
-<div id="bike-container" class="selection-grid"></div>
-
-<!-- Tombol ini hanya untuk Story Mode, Versus pakai logic klik langsung -->
-
-<button id="story-start-btn" class="action-btn" style="margin-top: 30px; background: linear-gradient(45deg, #00eaff, #008cff); color: white; min-width: 250px; font-size: 3vmin;" onclick="confirmStartGame()">MULAI BALAPAN</button>
-
-</div>
-
-
-<!-- IN-GAME UI -->
-
-<div id="game-ui" class="hide"></div>
-
-<div id="countdown-layer" class="hide"></div>
-
-
-<!-- GAME OVER -->
-
-<div id="game-over" class="screen hide">
-
-<h1>HASIL BALAPAN</h1>
-
-<div id="score-board"></div>
-
-<button class="action-btn" style="margin-top:20px;" onclick="goToMainMenu()">Menu Utama</button>
-
-</div>
-
-
-<script type="importmap">
-
-{
-
-"imports": {
-
-"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-
-}
-
-}
-
-</script>
-
-
-<script type="module">
-
-import * as THREE from 'three';
-
-
-// --- ASSET CONFIG ---
-
-const ASSETS = {
-
-road: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/road.png',
-
-tire: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/tire.png'
-
-};
-
-
-const BIKES = [
-
-{ id: 0, name: "Futuristik Standar", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor1.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor1.png" },
-
-{ id: 1, name: "Sport Agresif", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor2.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor2.png" },
-
-{ id: 2, name: "Ramah Anak", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor3.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor3.png" },
-
-{ id: 3, name: "Listrik Canggih", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor4.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor4.png" },
-
-{ id: 4, name: "Legendaris", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor5.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor5.png" }
-
-];
-
-
-const BACKGROUNDS = [
-
-{ id: 0, name: "Jalan Latihan", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl1.png" },
-
-{ id: 1, name: "Gurun Pasir", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl2.png" },
-
-{ id: 2, name: "Hutan Rimba", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl3.png" },
-
-{ id: 3, name: "Luar Angkasa", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl1.png" }
-
-];
-
-
-const COLORS = [0x00eaff, 0xff3333, 0x00ff66, 0xffaa00, 0xaa00ff, 0x00ffff];
-
-const ROAD_LENGTH = 1000;
-
-const LAP_DISTANCE = 3000;
-
-const POINTS_SYSTEM = [10, 8, 6, 4, 2, 0];
-
-const STORY_LEVELS = [
-
-{ id: 1, name: "Jalan Latihan", bgIdx: 0, laps: 1, aiSpeed: 0.6, locked: false },
-
-{ id: 2, name: "Gurun", bgIdx: 1, laps: 2, aiSpeed: 0.9, locked: true },
-
-{ id: 3, name: "Hutan", bgIdx: 2, laps: 3, aiSpeed: 1.2, locked: true },
-
-{ id: 4, name: "Luar Angkasa", bgIdx: 3, laps: 4, aiSpeed: 1.5, locked: true }
-
-];
-
-
-let scene, renderer, textureLoader;
-
-let texRoad, texTire; 
-
-let texBikeMap = {}; 
-
-let roads = [];
-
-let players = [];
-
-let finishOrder = []; 
-
-let globalSeasonPoints = 0; 
-
-
-let gameActive = false;
-
-let isCountingDown = false;
-
-let currentMode = 'STORY'; 
-
-let setupData = { playerCount: 1, laps: 2, bgUrl: '', bikeId: 0 };
-
-// Multiplayer Selection State
-
-let versusBikeSelections = {}; // { playerId: bikeId }
-
-let currentSelectingPlayer = 0;
-
-
-let raceStartTime = null;
-
-
-// --- INITIAL LOADING ---
-
-window.onload = function() {
-
-let progress = 0;
-
-const bar = document.getElementById('loader-fill');
-
-const interval = setInterval(() => {
-
-progress += Math.random() * 5;
-
-if(progress > 100) progress = 100;
-
-bar.style.width = progress + "%";
-
-if(progress === 100) {
-
-clearInterval(interval);
-
-setTimeout(() => {
-
-document.getElementById('loading-screen').classList.add('hide');
-
-document.getElementById('splash-screen').classList.remove('hide');
-
-}, 500);
-
-}
-
-}, 50);
-
-};
-
-
-window.enterMainMenu = function() {
-
-toggleScreen('main-menu');
-
-}
-
-
-// --- HELPER UTILS ---
-
-function formatTime(ms) {
-
-if (!ms) return "--:--.--";
-
-let min = Math.floor(ms / 60000);
-
-let sec = Math.floor((ms % 60000) / 1000);
-
-let centi = Math.floor((ms % 1000) / 10);
-
-return `${min}:${sec.toString().padStart(2, '0')}.${centi.toString().padStart(2, '0')}`;
-
-}
-
-
-// --- PLAYER CLASS ---
-
-class Player {
-
-constructor(id, color, isAI = false, startOffset = 0, bikeTextureUrl) {
-
-this.id = id;
-
-this.color = color;
-
-this.isAI = isAI;
-
-this.lap = 1;
-
-this.distance = 0;
-
-this.speed = 0;
-
-this.maxSpeed = 2.0;
-
-this.combo = 0;
-
-this.finished = false;
-
-this.finishTime = 0;
-
-this.hasQuit = false;
-
-this.baseX = startOffset * 2.5; 
-
-this.mesh = createBike(color, bikeTextureUrl);
-
-this.mesh.position.set(this.baseX, 0, 0);
-
-this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-
-this.camera.position.set(this.baseX, 3, 7);
-
-this.camera.rotation.x = -0.25;
-
-this.correctIndex = 0;
-
-}
-
-
-update() {
-
-if (this.hasQuit) return;
-
-if (this.finished) {
-
-if (this.speed > 0) {
-
-this.speed -= 0.02;
-
-this.mesh.position.z -= this.speed;
-
-this.camera.position.z = this.mesh.position.z + 7;
-
-}
-
-return; 
-
-}
-
-if (isCountingDown) return;
-
-
-if (this.isAI) {
-
-let targetSpeed = setupData.aiSpeed || 0.8;
-
-targetSpeed *= (0.9 + (this.id % 3) * 0.05); 
-
-let leadDistance = 0;
-
-players.forEach(p => { if(!p.isAI && p.distance > leadDistance) leadDistance = p.distance; });
-
-if (leadDistance > this.distance + 150) targetSpeed *= 1.3;
-
-this.speed = THREE.MathUtils.lerp(this.speed, targetSpeed, 0.05);
-
-} else {
-
-if (this.speed > 0.5) this.speed -= 0.003;
-
-}
-
-
-const moveStep = this.speed;
-
-this.mesh.position.z -= moveStep;
-
-this.distance += moveStep;
-
-this.mesh.position.x = this.baseX; 
-
-this.mesh.rotation.y = 0; 
-
-this.camera.position.z = this.mesh.position.z + 7;
-
-this.camera.position.x = this.baseX; 
-
-
-if (this.distance >= LAP_DISTANCE * this.lap) {
-
-if (this.lap >= setupData.laps) {
-
-this.finishRace();
-
-} else {
-
-this.lap++;
-
-this.showLapPopup();
-
-this.updateHUD(); 
-
-}
-
-}
-
-this.updateHUDStats();
-
-}
-
-
-quitRace() {
-
-window.goToMainMenu();
-
-}
-
-
-finishRace() {
-
-this.finished = true;
-
-this.finishTime = Date.now() - raceStartTime;
-
-finishOrder.push(this);
-
-if (!this.isAI) {
-
-const panel = document.getElementById(`panel-p${this.id}`);
-
-if (panel) {
-
-panel.querySelector('.finish-text').style.display = "block";
-
-panel.querySelector('.math-box').style.display = 'none';
-
-}
-
-if (currentMode === 'STORY') {
-
-finishStoryModeNow();
-
-}
-
-}
-
-checkAllFinished();
-
-}
-
-
-showLapPopup() {
-
-if(this.isAI) return;
-
-const popup = document.getElementById(`lap-popup-p${this.id}`);
-
-if(popup) {
-
-popup.innerText = `LAP ${this.lap}`; popup.classList.add('show');
-
-setTimeout(() => { popup.classList.remove('show'); }, 1500);
-
-}
-
-}
-
-
-generateMath() {
-
-if (this.isAI || this.finished || this.hasQuit) return; 
-
-const level = Math.floor(this.combo / 3) + 1;
-
-const max = level * 10;
-
-const min = (level - 1) * 5;
-
-const a = Math.floor(Math.random() * (max - min)) + min + 1;
-
-const b = Math.floor(Math.random() * (max - min)) + min + 1;
-
-const ans = a + b;
-
-let opts = [ans];
-
-while(opts.length < 3) {
-
-let r = ans + Math.floor(Math.random() * 10) - 5;
-
-if(r > 0 && !opts.includes(r)) opts.push(r);
-
-}
-
-opts.sort(() => Math.random() - 0.5);
-
-this.correctIndex = opts.indexOf(ans);
-
-const panel = document.getElementById(`panel-p${this.id}`);
-
-if(panel) {
-
-panel.querySelector('.math-question').innerText = `${a} + ${b} = ?`;
-
-const btns = panel.querySelectorAll('.math-btn');
-
-btns.forEach((btn, i) => { btn.innerText = opts[i]; btn.onclick = () => this.answer(i); });
-
-}
-
-}
-
-
-answer(idx) {
-
-if(this.finished || this.hasQuit) return;
-
-const feedback = document.getElementById(`fb-p${this.id}`);
-
-const panel = document.getElementById(`panel-p${this.id}`);
-
-const mathBox = panel.querySelector('.math-box');
-
-mathBox.classList.remove('anim-correct', 'anim-wrong'); void mathBox.offsetWidth; 
-
-if (idx === this.correctIndex) {
-
-this.combo++; this.speed = Math.min(this.speed + 0.6, 3.5); 
-
-feedback.innerText = "NICE!"; feedback.style.color = "#00ff66"; mathBox.classList.add('anim-correct');
-
-} else {
-
-this.combo = 0; this.speed = 0.5; 
-
-feedback.innerText = "RESET!"; feedback.style.color = "#ff3333"; mathBox.classList.add('anim-wrong');
-
-}
-
-feedback.style.opacity = 1;
-
-setTimeout(() => feedback.style.opacity = 0, 500);
-
-this.generateMath();
-
-}
-
-
-updateHUD() {
-
-const panel = document.getElementById(`panel-p${this.id}`);
-
-if(panel) panel.querySelector('.lap-info').innerText = `Lap: ${this.lap}/${setupData.laps}`;
-
-}
-
-
-updateHUDStats() {
-
-const panel = document.getElementById(`panel-p${this.id}`);
-
-if(panel && !this.isAI) {
-
-const speedVal = Math.floor(this.speed * 100);
-
-panel.querySelector('.speed-text').innerText = `${speedVal} km/h`;
-
-if (raceStartTime && !this.finished && !this.hasQuit) {
-
-panel.querySelector('.timer-display').innerText = formatTime(Date.now() - raceStartTime);
-
-} else if (this.finished) {
-
-panel.querySelector('.timer-display').innerText = formatTime(this.finishTime);
-
-}
-
-const totalDist = LAP_DISTANCE * setupData.laps;
-
-players.forEach(enemy => {
-
-const enemyPct = Math.min((enemy.distance / totalDist) * 100, 100);
-
-const marker = document.getElementById(`marker-p${enemy.id}-in-p${this.id}`);
-
-if(marker) marker.style.bottom = `${enemyPct}%`;
-
-});
-
-}
-
-}
-
-}
-
-
-// --- STORY MODE FINISH LOGIC ---
-
-function finishStoryModeNow() {
-
-const now = Date.now();
-
-const elapsedTime = now - raceStartTime;
-
-players.forEach(p => {
-
-if (!p.finished && p.isAI) {
-
-p.finished = true;
-
-const totalRaceDist = LAP_DISTANCE * setupData.laps;
-
-const remainingDist = totalRaceDist - p.distance;
-
-const speed = p.speed > 0.1 ? p.speed : 0.5; 
-
-const msNeeded = (remainingDist / speed) * 16.66;
-
-p.finishTime = elapsedTime + msNeeded;
-
-}
-
-});
-
-setTimeout(showGameOver, 1500); 
-
-}
-
-
-// --- 3D SETUP ---
-
-function initScene() {
-
-const container = document.getElementById('game-container');
-
-container.innerHTML = '';
-
-scene = new THREE.Scene();
-
-textureLoader = new THREE.TextureLoader();
-
-const skyUrl = setupData.bgUrl || ASSETS.sky;
-
-textureLoader.load(skyUrl, (tex) => {
-
-tex.mapping = THREE.EquirectangularReflectionMapping;
-
-scene.background = tex;
-
-});
-
-texRoad = textureLoader.load(ASSETS.road);
-
-texRoad.wrapS = THREE.RepeatWrapping; texRoad.wrapT = THREE.RepeatWrapping;
-
-texRoad.repeat.set(1, 20); 
-
-texTire = textureLoader.load(ASSETS.tire);
-
-
-BIKES.forEach(b => {
-
-if(!texBikeMap[b.id]) texBikeMap[b.id] = textureLoader.load(b.tex);
-
-});
-
-
-scene.fog = new THREE.Fog(0x1a1a2e, 20, 150);
-
-const amb = new THREE.AmbientLight(0xffffff, 0.8); scene.add(amb);
-
-const dir = new THREE.DirectionalLight(0xffffff, 1.5); dir.position.set(10, 20, 10); scene.add(dir);
-
-
-renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-renderer.setScissorTest(true); 
-
-container.appendChild(renderer.domElement);
-
-
-for(let i=0; i<10; i++) { createRoadSegment(-(ROAD_LENGTH/2) - (ROAD_LENGTH * i)); }
-
-}
-
-
-function createRoadSegment(zPos) {
-
-const geo = new THREE.PlaneGeometry(60, ROAD_LENGTH, 1, 1);
-
-const mat = new THREE.MeshStandardMaterial({ map: texRoad, roughness: 0.8, color: 0xaaaaaa });
-
-const mesh = new THREE.Mesh(geo, mat);
-
-mesh.rotation.x = -Math.PI/2; mesh.position.z = zPos; mesh.frustumCulled = false;
-
-scene.add(mesh); roads.push(mesh);
-
-}
-
-
-function createBike(color, texUrl) {
-
-const g = new THREE.Group();
-
-let bikeTex = texUrl ? textureLoader.load(texUrl) : texBikeMap[setupData.bikeId];
-
-const geo = new THREE.PlaneGeometry(2.5, 2.5); 
-
-const mat = new THREE.MeshBasicMaterial({ 
-
-map: bikeTex, 
-
-transparent: true, 
-
-side: THREE.DoubleSide,
-
-alphaTest: 0.1 
-
-});
-
-const sprite = new THREE.Mesh(geo, mat);
-
-sprite.position.y = 1.25; 
-
-g.add(sprite);
-
-
-const shadowGeo = new THREE.CircleGeometry(1, 32);
-
-const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0.5, transparent: true });
-
-const shadow = new THREE.Mesh(shadowGeo, shadowMat);
-
-shadow.rotation.x = -Math.PI / 2;
-
-shadow.position.y = 0.02;
-
-g.add(shadow);
-
-
-const markGeo = new THREE.ConeGeometry(0.2, 0.3, 4);
-
-const markMat = new THREE.MeshBasicMaterial({ color: color });
-
-const marker = new THREE.Mesh(markGeo, markMat);
-
-marker.position.y = 2.6; 
-
-marker.rotation.z = Math.PI; 
-
-g.add(marker);
-
-
-return g;
-
-}
-
-
-// --- GAME LOOP ---
-
-function animate() {
-
-if (!gameActive) return;
-
-requestAnimationFrame(animate);
-
-let trailingZ = -Infinity;
-
-players.forEach(p => { if(p.mesh.position.z > trailingZ) trailingZ = p.mesh.position.z; });
-
-roads.forEach(r => {
-
-if (r.position.z > (trailingZ + ROAD_LENGTH/2 + 200)) { 
-
-let frontZ = Infinity;
-
-roads.forEach(road => { if(road.position.z < frontZ) frontZ = road.position.z; });
-
-r.position.z = frontZ - ROAD_LENGTH;
-
-}
-
-});
-
-players.forEach(p => p.update());
-
-const width = window.innerWidth;
-
-const height = window.innerHeight;
-
-renderer.setSize(width, height);
-
-let n = players.length;
-
-if (currentMode === 'STORY') n = 1; 
-
-
-// --- FIXED SPLIT SCREEN LOGIC ---
-
-if (currentMode === 'VERSUS') {
-
-const stripWidth = width / n;
-
-players.forEach((p, i) => {
-
-const left = i * stripWidth;
-
-renderer.setViewport(left, 0, stripWidth, height);
-
-renderer.setScissor(left, 0, stripWidth, height);
-
-p.camera.aspect = stripWidth / height;
-
-p.camera.updateProjectionMatrix();
-
-renderer.render(scene, p.camera);
-
-});
-
-} else {
-
-// Story Mode (Full Screen)
-
-renderer.setViewport(0, 0, width, height);
-
-renderer.setScissor(0, 0, width, height);
-
-players[0].camera.aspect = width / height;
-
-players[0].camera.updateProjectionMatrix();
-
-renderer.render(scene, players[0].camera);
-
-}
-
-}
-
-
-// --- GAME LOGIC ---
-
-function startCountdown() {
-
-isCountingDown = true; raceStartTime = null;
-
-const layer = document.getElementById('countdown-layer'); layer.classList.remove('hide'); layer.innerHTML = '';
-
-let count = 3;
-
-function showNumber() {
-
-if (count > 0) { layer.innerHTML = `<div class="countdown-text" style="color:red">${count}</div>`; count--; setTimeout(showNumber, 1000); }
-
-else if (count === 0) { layer.innerHTML = `<div class="countdown-text" style="color:#00ff66">GO!</div>`; raceStartTime = Date.now(); count--; setTimeout(showNumber, 1000); }
-
-else { layer.classList.add('hide'); isCountingDown = false; }
-
-}
-
-showNumber();
-
-}
-
-
-function checkAllFinished() {
-
-if (currentMode !== 'STORY') {
-
-if (players.every(p => p.finished || p.hasQuit)) setTimeout(showGameOver, 2000);
-
-}
-
-}
-
-
-// --- MENU LOGIC ---
-
-window.goToMainMenu = () => { gameActive = false; toggleScreen('main-menu'); };
-
-window.showStoryMenu = () => {
-
-toggleScreen('story-menu');
-
-document.getElementById('story-points').innerText = `Total Poin Musim: ${globalSeasonPoints}`;
-
-const cont = document.getElementById('level-container');
-
-cont.innerHTML = '';
-
-STORY_LEVELS.forEach(lvl => {
-
-const div = document.createElement('div');
-
-div.className = `level-card ${lvl.locked ? '' : 'unlocked'}`;
-
-div.style.backgroundImage = `url('${BACKGROUNDS[lvl.bgIdx].url}')`;
-
-div.innerHTML = `
-
-<div class="level-card-overlay">
-
-<div class="lvl-title">${lvl.name}</div>
-
-<div class="lvl-desc">${lvl.laps} Laps</div>
-
-${lvl.locked ? '<div style="color:red; margin-top:5px; font-weight:bold;">LOCKED</div>' : ''}
-
-</div>
-
-`;
-
-if(!lvl.locked) div.onclick = () => startStoryLevel(lvl.id);
-
-cont.appendChild(div);
-
-});
-
-};
-
-// FIXED: Set currentMode to VERSUS explicitly
-
-window.showVersusMenu = () => { 
-
-currentMode = 'VERSUS';
-
-toggleScreen('versus-menu'); 
-
-setPlayers(2); setLaps(3); 
-
-};
-
-window.setPlayers = (n) => { 
-
-setupData.playerCount = n; 
-
-updateBtnGroup('player-select', n + ' Player'); 
-
-};
-
-window.setLaps = (n) => { 
-
-setupData.laps = n; 
-
-updateBtnGroup('lap-select', n + ' Lap'); 
-
-};
-
-window.startStoryLevel = (levelId) => {
-
-const lvl = STORY_LEVELS.find(l => l.id === levelId);
-
-if (lvl.locked) return;
-
-currentMode = 'STORY';
-
-setupData = { playerCount: 1, laps: lvl.laps, aiSpeed: lvl.aiSpeed, bgUrl: BACKGROUNDS[lvl.bgIdx].url, bikeId: 0 };
-
-showBikeSelect();
-
-};
-
-
-window.showTrackSelect = () => {
-
-toggleScreen('track-select-menu');
-
-const cont = document.getElementById('track-container');
-
-cont.innerHTML = '';
-
-BACKGROUNDS.forEach(bg => {
-
-const div = document.createElement('div');
-
-div.className = 'card-item';
-
-div.innerHTML = `<img src="${bg.url}"><div class="card-title">${bg.name}</div>`;
-
-div.onclick = () => {
-
-setupData.bgUrl = bg.url;
-
-showBikeSelect();
-
-};
-
-cont.appendChild(div);
-
-});
-
-};
-
-
-// --- NEW VERSUS BIKE SELECTION LOGIC ---
-
-window.showBikeSelect = () => {
-
-toggleScreen('bike-select-menu');
-
-// Reset state
-
-versusBikeSelections = {};
-
-currentSelectingPlayer = 0;
-
-if (currentMode === 'VERSUS') {
-
-updateVersusBikeUI();
-
-} else {
-
-// Story Mode UI
-
-document.getElementById('bike-select-title').innerText = "Pilih Motor";
-
-document.getElementById('bike-select-desc').innerText = "Pilih kendaraan untuk Story Mode";
-
-document.getElementById('story-start-btn').style.display = "block";
-
-renderBikeGrid();
-
-}
-
-};
-
-
-function updateVersusBikeUI() {
-
-document.getElementById('story-start-btn').style.display = "none";
-
-document.getElementById('bike-select-title').innerHTML = `PEMAIN <span style="color:${'#'+COLORS[currentSelectingPlayer].toString(16)}">${currentSelectingPlayer + 1}</span> MEMILIH`;
-
-document.getElementById('bike-select-desc').innerText = `Silakan pilih motor yang belum digunakan.`;
-
-renderBikeGrid();
-
-}
-
-
-function renderBikeGrid() {
-
-const cont = document.getElementById('bike-container');
-
-cont.innerHTML = '';
-
-BIKES.forEach(b => {
-
-const div = document.createElement('div');
-
-div.className = `card-item`;
-
-// Cek status motor (selected/disabled)
-
-let isSelectedByMe = false;
-
-let isTaken = false;
-
-let takenBy = -1;
-
-
-if (currentMode === 'VERSUS') {
-
-// Cek apakah motor ini sudah diambil pemain lain
-
-for(let pid in versusBikeSelections) {
-
-if(versusBikeSelections[pid] === b.id) {
-
-isTaken = true;
-
-takenBy = parseInt(pid) + 1;
-
-}
-
-}
-
-} else {
-
-// Story Mode
-
-if (setupData.bikeId === b.id) isSelectedByMe = true;
-
-}
-
-
-if (isTaken) {
-
-div.classList.add('disabled');
-
-div.innerHTML = `<div class="owner-badge">P${takenBy}</div>`;
-
-}
-
-if (isSelectedByMe) div.classList.add('selected');
-
-
-div.innerHTML += `<img src="${b.thumb}"><div class="card-title">${b.name}</div>`;
-
-div.onclick = () => {
-
-if (isTaken) return; // Tidak bisa pilih motor yang sudah diambil
-
-
-if (currentMode === 'VERSUS') {
-
-// Pilih motor untuk player ini
-
-versusBikeSelections[currentSelectingPlayer] = b.id;
-
-currentSelectingPlayer++;
-
-if (currentSelectingPlayer >= setupData.playerCount) {
-
-// Semua pemain sudah memilih
-
-startGame();
-
-} else {
-
-// Lanjut ke pemain berikutnya
-
-updateVersusBikeUI();
-
-}
-
-} else {
-
-// Story Mode Logic
-
-setupData.bikeId = b.id;
-
-Array.from(cont.children).forEach(c => c.classList.remove('selected'));
-
-div.classList.add('selected');
-
-}
-
-};
-
-cont.appendChild(div);
-
-});
-
-}
-
-
-window.confirmStartGame = () => {
-
-startGame();
-
-};
-
-
-window.quitGame = (playerId) => { if(players[playerId]) players[playerId].quitRace(); };
-
-
-function toggleScreen(id) { document.querySelectorAll('.screen').forEach(el => el.classList.add('hide')); document.getElementById(id).classList.remove('hide'); }
-
-function updateBtnGroup(id, txt) { document.getElementById(id).querySelectorAll('button').forEach(b => { if(b.innerText.includes(txt)) b.classList.add('active'); else b.classList.remove('active'); }); }
-
-
-function startGame() {
-
-document.querySelectorAll('.screen').forEach(el => el.classList.add('hide'));
-
-document.getElementById('game-ui').classList.remove('hide');
-
-initScene();
-
-players = []; finishOrder = []; 
-
-const uiContainer = document.getElementById('game-ui');
-
-uiContainer.innerHTML = ''; uiContainer.className = '';
-
-let uiCount = (currentMode === 'STORY') ? 1 : setupData.playerCount;
-
-let totalBikes = (currentMode === 'STORY') ? 5 : setupData.playerCount;
-
-uiContainer.classList.add(`grid-${uiCount}`);
-
-
-// Create Human Players
-
-for (let i = 0; i < uiCount; i++) {
-
-let startOffset = i - (totalBikes - 1) / 2;
-
-let chosenBikeUrl;
-
-if(currentMode === 'VERSUS') {
-
-// Gunakan pilihan dari menu versus
-
-let bikeId = versusBikeSelections[i];
-
-chosenBikeUrl = BIKES[bikeId].tex;
-
-} else {
-
-chosenBikeUrl = BIKES[setupData.bikeId].tex;
-
-}
-
-
-let p = new Player(i, COLORS[i], false, startOffset, chosenBikeUrl);
-
-players.push(p); scene.add(p.mesh);
-
-
-let markersHTML = `<div id="marker-p${i}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[i].toString(16)}; z-index:2; border:1px solid white;"></div>`;
-
-for(let j=0; j<totalBikes; j++) { if(j!==i) markersHTML += `<div id="marker-p${j}-in-p${i}" class="minimap-marker" style="background: white; width:12px; left:-1px;"></div>`; }
-
-
-const panel = document.createElement('div');
-
-panel.className = `player-panel`; panel.id = `panel-p${i}`;
-
-panel.innerHTML = `
-
-<div class="p-color-bar" style="background:${'#'+COLORS[i].toString(16)}"></div>
-
-<div class="hud-top">
-
-<div class="hud-info-box">
-
-<div style="color:${'#'+COLORS[i].toString(16)}; font-weight:bold;">P${i+1}</div>
-
-<div class="lap-info" style="color:#aaa;">Lap 1/${setupData.laps}</div>
-
-<div class="timer-display">0:00.00</div>
-
-</div>
-
-<div style="display:flex; align-items:center;">
-
-<div class="speed-box hud-info-box"><span class="speed-text">0 km/h</span></div>
-
-<div class="minimap-container">${markersHTML}</div>
-
-<button class="quit-btn" onclick="quitGame(${i})">QUIT</button>
-
-</div>
-
-</div>
-
-<div class="feedback-overlay" id="fb-p${i}">NICE!</div>
-
-<div class="lap-popup" id="lap-popup-p${i}">LAP 2</div>
-
-<div class="finish-text">FINISH!</div>
-
-<div class="math-box">
-
-<div class="math-question">Ready?</div>
-
-<div class="math-options"><button class="math-btn">A</button><button class="math-btn">B</button><button class="math-btn">C</button></div>
-
-</div>
-
-`;
-
-uiContainer.appendChild(panel); p.generateMath();
-
-}
-
-
-// Create AI
-
-if (currentMode === 'STORY') {
-
-for(let j=1; j<=4; j++) {
-
-let startOffset = j - (totalBikes - 1) / 2;
-
-let aiBikeId = (setupData.bikeId + j) % 5; 
-
-let ai = new Player(j, COLORS[j], true, startOffset, BIKES[aiBikeId].tex);
-
-players.push(ai); scene.add(ai.mesh);
-
-let aiMarker = document.getElementById(`marker-p${j}-in-p0`);
-
-if(aiMarker) aiMarker.style.background = '#' + COLORS[j].toString(16);
-
-}
-
-}
-
-
-gameActive = true; animate(); startCountdown();
-
-}
-
-
-function showGameOver() {
-
-gameActive = false; document.getElementById('game-ui').classList.add('hide');
-
-const goScreen = document.getElementById('game-over'); goScreen.classList.remove('hide');
-
-const sb = document.getElementById('score-board');
-
-sb.innerHTML = `<div class="score-row score-header"><span>Pos</span><span>Pembalap</span><span>Waktu & Poin</span></div>`;
-
-let allPlayers = [...players];
-
-allPlayers.sort((a, b) => {
-
-if (a.finished && b.finished) return a.finishTime - b.finishTime;
-
-if (a.finished) return -1;
-
-if (b.finished) return 1;
-
-return b.distance - a.distance;
-
-});
-
-
-allPlayers.forEach((p, idx) => {
-
-let name = p.isAI ? `CPU Opponent ${p.id}` : `Player ${p.id+1}`;
-
-let timeStr = p.finished ? formatTime(p.finishTime) : "DNF";
-
-let points = (p.finished && idx < POINTS_SYSTEM.length) ? POINTS_SYSTEM[idx] : 0;
-
-if (currentMode === 'STORY' && !p.isAI) globalSeasonPoints += points;
-
-let row = document.createElement('div'); row.className = 'score-row';
-
-if(p.id === 0 && currentMode === 'STORY') row.style.border = "2px solid #00eaff"; 
-
-row.innerHTML = `<span style="color:${'#'+p.color.toString(16)}">#${idx+1}</span><span>${name}</span><span>${timeStr} <b style="color:#ffd700">(+${points} Pts)</b></span>`;
-
-sb.appendChild(row);
-
-});
-
-if (currentMode === 'STORY') {
-
-let playerRank = allPlayers.findIndex(p => p.id === 0);
-
-if (playerRank !== -1 && playerRank < 3 && allPlayers[playerRank].finished) {
-
-unlockNextLevel(); sb.appendChild(createMsg(`<h3 style="color:#00ff66">SELAMAT! LEVEL BERIKUTNYA TERBUKA</h3>`));
-
-} else {
-
-sb.appendChild(createMsg(`<h3 style="color:#ff3333">GAGAL PODIUM. COBA LAGI!</h3>`));
-
-}
-
-sb.appendChild(createMsg(`<h2 style="margin-top:20px; color:#ffd700">TOTAL POIN MUSIM: ${globalSeasonPoints}</h2>`));
-
-}
-
-}
-
-function createMsg(html) { const d = document.createElement('div'); d.innerHTML = html; return d; }
-
-function unlockNextLevel() {
-
-let lvl = STORY_LEVELS.find(l => l.laps === setupData.laps && l.aiSpeed === setupData.aiSpeed);
-
-if (lvl) { let idx = STORY_LEVELS.indexOf(lvl) + 1; if (idx < STORY_LEVELS.length) STORY_LEVELS[idx].locked = false; }
-
-}
-
-</script>
-
+    <div id="game-container"></div>
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="screen">
+        <h2 class="loading-text">MENGAMBIL DATA PEMBALAP DAN SIRKUIT...</h2>
+        <div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
+    </div>
+
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen" class="screen hide">
+        <h1 style="font-size: 6vmin; margin-bottom: 5px;">KOMANDAN TURBO</h1>
+        <h2 style="color:#00eaff; font-size: 3vmin; letter-spacing: 5px;">MISI PENJUMLAHAN</h2>
+        <p style="margin-top: 50px;">SIAPKAN LOGIKA & KECEPATANMU</p>
+        <button class="action-btn start-btn-large" onclick="enterMainMenu()">START</button>
+
+        <div class="footer-credit">
+            <div class="credit-text">Game Design by @herisheroes 2026</div>
+            <div class="social-icons">
+                <a href="https://www.youtube.com/@herisheroes" target="_blank"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@herisheroes" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/herisheroes" target="_blank"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN MENU -->
+    <div id="main-menu" class="screen hide">
+        <h1>MAIN MENU</h1>
+        <div class="btn-group">
+            <button class="action-btn" onclick="showStoryMenu()">Story Mode</button>
+            <button class="action-btn" onclick="showVersusMenu()">Versus Mode</button>
+        </div>
+    </div>
+
+    <!-- STORY MODE: LEVEL SELECT -->
+    <div id="story-menu" class="screen hide">
+        <h1>Story Mode</h1>
+        <h2>Pilih Level</h2>
+        <div id="story-points" style="color: #ffd700; margin-bottom: 20px; font-size: 3vmin; text-shadow: 2px 2px 0 black; font-weight: bold;">Total Poin Musim: 0</div>
+        <div id="level-container" class="btn-group" style="width:100%; max-width:1000px;"></div>
+        <button class="action-btn" style="margin-top: 30px;" onclick="goToMainMenu()">Kembali</button>
+    </div>
+
+    <!-- VERSUS: SETUP -->
+    <div id="versus-menu" class="screen hide">
+        <h1>Versus Mode</h1>
+        <div class="setup-section">
+            <h3>JUMLAH PEMAIN</h3>
+            <div class="btn-group" id="player-select">
+                <button class="option-card" onclick="setPlayers(2)">2 Player</button>
+                <button class="option-card" onclick="setPlayers(3)">3 Player</button>
+                <button class="option-card" onclick="setPlayers(4)">4 Player</button>
+            </div>
+        </div>
+        
+        <div class="setup-section">
+            <h3>JUMLAH LAP</h3>
+            <div class="btn-group" id="lap-select">
+                <button class="option-card" onclick="setLaps(1)">1 Lap</button>
+                <button class="option-card" onclick="setLaps(3)">3 Lap</button>
+                <button class="option-card" onclick="setLaps(5)">5 Lap</button>
+            </div>
+        </div>
+
+        <button class="action-btn" style="margin-top: 20px; min-width: 200px; background: #00eaff; color: #000;" onclick="showTrackSelect()">LANJUT</button>
+        <button class="action-btn" style="margin-top: 10px; background: transparent; border: none; color: #ccc;" onclick="goToMainMenu()">Kembali</button>
+    </div>
+
+    <!-- SELECT TRACK (VERSUS) -->
+    <div id="track-select-menu" class="screen hide">
+        <h1>Pilih Lokasi Balap</h1>
+        <div id="track-container" class="selection-grid"></div>
+        <button class="action-btn" style="margin-top: 20px;" onclick="showVersusMenu()">Kembali</button>
+    </div>
+
+    <!-- SELECT BIKE (GLOBAL & VERSUS TURN BASED) -->
+    <div id="bike-select-menu" class="screen hide">
+        <h1 id="bike-select-title">Pilih Motor</h1>
+        <p id="bike-select-desc">Pilih kendaraan andalanmu!</p>
+        <div id="bike-container" class="selection-grid"></div>
+        <!-- Tombol ini hanya untuk Story Mode, Versus pakai logic klik langsung -->
+        <button id="story-start-btn" class="action-btn" style="margin-top: 30px; background: linear-gradient(45deg, #00eaff, #008cff); color: white; min-width: 250px; font-size: 3vmin;" onclick="confirmStartGame()">MULAI BALAPAN</button>
+    </div>
+
+    <!-- IN-GAME UI -->
+    <div id="game-ui" class="hide"></div>
+    <div id="countdown-layer" class="hide"></div>
+
+    <!-- GAME OVER -->
+    <div id="game-over" class="screen hide">
+        <h1>HASIL BALAPAN</h1>
+        <div id="score-board"></div>
+        <button class="action-btn" style="margin-top:20px;" onclick="goToMainMenu()">Menu Utama</button>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- AUDIO MANAGER ---
+        const SoundManager = {
+            ctx: null,
+            masterGain: null,
+            init: function() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.masterGain = this.ctx.createGain();
+                    this.masterGain.gain.value = 0.5; // Master volume
+                    this.masterGain.connect(this.ctx.destination);
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            playBeep: function(freq, duration) {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            },
+            createEngineSound: function() {
+                if (!this.ctx) return null;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.value = 50; // Base idle pitch
+                gain.gain.value = 0; // Start silent
+                osc.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start();
+                return { osc, gain };
+            }
+        };
+
+        // --- ASSET CONFIG ---
+        const ASSETS = {
+            road: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/road.png',
+            tire: 'https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/tire.png'
+        };
+
+        const BIKES = [
+            { id: 0, name: "Futuristik Standar", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor1.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor1.png" },
+            { id: 1, name: "Sport Agresif", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor2.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor2.png" },
+            { id: 2, name: "Ramah Anak", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor3.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor3.png" },
+            { id: 3, name: "Listrik Canggih", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor4.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor4.png" },
+            { id: 4, name: "Legendaris", thumb: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/pilih_motor5.png", tex: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/motor5.png" }
+        ];
+
+        const BACKGROUNDS = [
+            { id: 0, name: "Jalan Latihan", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl1.png" },
+            { id: 1, name: "Gurun Pasir", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl2.png" },
+            { id: 2, name: "Hutan Rimba", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl3.png" },
+            { id: 3, name: "Luar Angkasa", url: "https://raw.githubusercontent.com/herisheroes/kgp/refs/heads/main/backlvl1.png" }
+        ];
+
+        const COLORS = [0x00eaff, 0xff3333, 0x00ff66, 0xffaa00, 0xaa00ff, 0x00ffff];
+        const ROAD_LENGTH = 1000;
+        const LAP_DISTANCE = 3000;
+        const POINTS_SYSTEM = [10, 8, 6, 4, 2, 0];
+        
+        const STORY_LEVELS = [
+            { id: 1, name: "Jalan Latihan", bgIdx: 0, laps: 1, aiSpeed: 0.6, locked: false },
+            { id: 2, name: "Gurun", bgIdx: 1, laps: 2, aiSpeed: 0.9, locked: true },
+            { id: 3, name: "Hutan", bgIdx: 2, laps: 3, aiSpeed: 1.2, locked: true },
+            { id: 4, name: "Luar Angkasa", bgIdx: 3, laps: 4, aiSpeed: 1.5, locked: true }
+        ];
+
+        let scene, renderer, textureLoader;
+        let texRoad, texTire; 
+        let texBikeMap = {}; 
+        
+        let roads = [];
+        let players = [];
+        let finishOrder = []; 
+        let globalSeasonPoints = 0; 
+
+        let gameActive = false;
+        let isCountingDown = false;
+        let currentMode = 'STORY'; 
+        let setupData = { playerCount: 1, laps: 2, bgUrl: '', bikeId: 0 };
+        
+        // Multiplayer Selection State
+        let versusBikeSelections = {}; // { playerId: bikeId }
+        let currentSelectingPlayer = 0;
+
+        let raceStartTime = null;
+
+        // --- INITIAL LOADING ---
+        window.onload = function() {
+            let progress = 0;
+            const bar = document.getElementById('loader-fill');
+            const interval = setInterval(() => {
+                progress += Math.random() * 5;
+                if(progress > 100) progress = 100;
+                bar.style.width = progress + "%";
+                if(progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').classList.add('hide');
+                        document.getElementById('splash-screen').classList.remove('hide');
+                    }, 500);
+                }
+            }, 50);
+        };
+
+        window.enterMainMenu = function() {
+            SoundManager.init(); // Init Audio Context
+            toggleScreen('main-menu');
+        }
+
+        // --- HELPER UTILS ---
+        function formatTime(ms) {
+            if (!ms) return "--:--.--";
+            let min = Math.floor(ms / 60000);
+            let sec = Math.floor((ms % 60000) / 1000);
+            let centi = Math.floor((ms % 1000) / 10);
+            return `${min}:${sec.toString().padStart(2, '0')}.${centi.toString().padStart(2, '0')}`;
+        }
+
+        // --- PLAYER CLASS ---
+        class Player {
+            constructor(id, color, isAI = false, startOffset = 0, bikeTextureUrl) {
+                this.id = id;
+                this.color = color;
+                this.isAI = isAI;
+                this.lap = 1;
+                this.distance = 0;
+                this.speed = 0;
+                this.maxSpeed = 2.0;
+                this.combo = 0;
+                this.finished = false;
+                this.finishTime = 0;
+                this.hasQuit = false;
+                this.rank = 1; // Posisi balap
+                this.baseX = startOffset * 2.5; 
+                this.mesh = createBike(color, bikeTextureUrl);
+                this.mesh.position.set(this.baseX, 0, 0);
+                this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
+                this.camera.position.set(this.baseX, 3, 7);
+                this.camera.rotation.x = -0.25;
+                this.correctIndex = 0;
+                
+                // Audio Engine (Hanya untuk Human Player agar tidak berisik)
+                this.engineSound = null;
+                if (!isAI) {
+                    this.engineSound = SoundManager.createEngineSound();
+                }
+            }
+
+            update() {
+                // Update Audio Pitch based on Speed
+                if (this.engineSound && !this.finished && !this.hasQuit) {
+                    // Base 50hz, max speed adds 150hz
+                    this.engineSound.osc.frequency.value = 50 + (this.speed * 100);
+                    // Volume naik sedikit saat jalan
+                    this.engineSound.gain.gain.value = this.speed > 0.1 ? 0.1 : 0.02;
+                } else if (this.engineSound) {
+                    this.engineSound.gain.gain.value = 0; // Silence if finished
+                }
+
+                if (this.hasQuit) return;
+                if (this.finished) {
+                    if (this.speed > 0) {
+                        this.speed -= 0.02;
+                        this.mesh.position.z -= this.speed;
+                        this.camera.position.z = this.mesh.position.z + 7;
+                    }
+                    return; 
+                }
+                if (isCountingDown) return;
+
+                if (this.isAI) {
+                    let targetSpeed = setupData.aiSpeed || 0.8;
+                    targetSpeed *= (0.9 + (this.id % 3) * 0.05); 
+                    let leadDistance = 0;
+                    players.forEach(p => { if(!p.isAI && p.distance > leadDistance) leadDistance = p.distance; });
+                    if (leadDistance > this.distance + 150) targetSpeed *= 1.3;
+                    this.speed = THREE.MathUtils.lerp(this.speed, targetSpeed, 0.05);
+                } else {
+                    if (this.speed > 0.5) this.speed -= 0.003;
+                }
+
+                const moveStep = this.speed;
+                this.mesh.position.z -= moveStep;
+                this.distance += moveStep;
+                this.mesh.position.x = this.baseX; 
+                this.mesh.rotation.y = 0; 
+                this.camera.position.z = this.mesh.position.z + 7;
+                this.camera.position.x = this.baseX; 
+
+                if (this.distance >= LAP_DISTANCE * this.lap) {
+                    if (this.lap >= setupData.laps) {
+                        this.finishRace();
+                    } else {
+                        this.lap++;
+                        this.showLapPopup();
+                        this.updateHUD(); 
+                    }
+                }
+                this.updateHUDStats();
+            }
+
+            quitRace() {
+                window.goToMainMenu();
+            }
+
+            finishRace() {
+                this.finished = true;
+                this.finishTime = Date.now() - raceStartTime;
+                finishOrder.push(this);
+                if (!this.isAI) {
+                    const panel = document.getElementById(`panel-p${this.id}`);
+                    if (panel) {
+                        panel.querySelector('.finish-text').style.display = "block";
+                        panel.querySelector('.math-box').style.display = 'none';
+                    }
+                    if (currentMode === 'STORY') {
+                        finishStoryModeNow();
+                    }
+                }
+                checkAllFinished();
+            }
+
+            showLapPopup() {
+                if(this.isAI) return;
+                const popup = document.getElementById(`lap-popup-p${this.id}`);
+                if(popup) {
+                    popup.innerText = `LAP ${this.lap}`; popup.classList.add('show');
+                    setTimeout(() => { popup.classList.remove('show'); }, 1500);
+                }
+            }
+
+            generateMath() {
+                if (this.isAI || this.finished || this.hasQuit) return; 
+                const level = Math.floor(this.combo / 3) + 1;
+                const max = level * 10;
+                const min = (level - 1) * 5;
+                const a = Math.floor(Math.random() * (max - min)) + min + 1;
+                const b = Math.floor(Math.random() * (max - min)) + min + 1;
+                const ans = a + b;
+                let opts = [ans];
+                while(opts.length < 3) {
+                    let r = ans + Math.floor(Math.random() * 10) - 5;
+                    if(r > 0 && !opts.includes(r)) opts.push(r);
+                }
+                opts.sort(() => Math.random() - 0.5);
+                this.correctIndex = opts.indexOf(ans);
+                const panel = document.getElementById(`panel-p${this.id}`);
+                if(panel) {
+                    panel.querySelector('.math-question').innerText = `${a} + ${b} = ?`;
+                    const btns = panel.querySelectorAll('.math-btn');
+                    btns.forEach((btn, i) => { btn.innerText = opts[i]; btn.onclick = () => this.answer(i); });
+                }
+            }
+
+            answer(idx) {
+                if(this.finished || this.hasQuit) return;
+                const feedback = document.getElementById(`fb-p${this.id}`);
+                const panel = document.getElementById(`panel-p${this.id}`);
+                const mathBox = panel.querySelector('.math-box');
+                mathBox.classList.remove('anim-correct', 'anim-wrong'); void mathBox.offsetWidth; 
+                if (idx === this.correctIndex) {
+                    this.combo++; this.speed = Math.min(this.speed + 0.6, 3.5); 
+                    feedback.innerText = "NICE!"; feedback.style.color = "#00ff66"; mathBox.classList.add('anim-correct');
+                } else {
+                    this.combo = 0; this.speed = 0.5; 
+                    feedback.innerText = "RESET!"; feedback.style.color = "#ff3333"; mathBox.classList.add('anim-wrong');
+                }
+                feedback.style.opacity = 1;
+                setTimeout(() => feedback.style.opacity = 0, 500);
+                this.generateMath();
+            }
+
+            updateHUD() {
+                const panel = document.getElementById(`panel-p${this.id}`);
+                if(panel) panel.querySelector('.lap-info').innerText = `Lap: ${this.lap}/${setupData.laps}`;
+            }
+
+            updateHUDStats() {
+                const panel = document.getElementById(`panel-p${this.id}`);
+                if(panel && !this.isAI) {
+                    const speedVal = Math.floor(this.speed * 100);
+                    panel.querySelector('.speed-text').innerText = `${speedVal} km/h`;
+                    panel.querySelector('.rank-display').innerText = `POS: ${this.rank}/${players.length}`;
+                    
+                    if (raceStartTime && !this.finished && !this.hasQuit) {
+                        panel.querySelector('.timer-display').innerText = formatTime(Date.now() - raceStartTime);
+                    } else if (this.finished) {
+                         panel.querySelector('.timer-display').innerText = formatTime(this.finishTime);
+                    }
+                    const totalDist = LAP_DISTANCE * setupData.laps;
+                    players.forEach(enemy => {
+                        const enemyPct = Math.min((enemy.distance / totalDist) * 100, 100);
+                        const marker = document.getElementById(`marker-p${enemy.id}-in-p${this.id}`);
+                        if(marker) marker.style.bottom = `${enemyPct}%`;
+                    });
+                }
+            }
+        }
+
+        // --- STORY MODE FINISH LOGIC ---
+        function finishStoryModeNow() {
+            const now = Date.now();
+            const elapsedTime = now - raceStartTime;
+            players.forEach(p => {
+                if (!p.finished && p.isAI) {
+                    p.finished = true;
+                    const totalRaceDist = LAP_DISTANCE * setupData.laps;
+                    const remainingDist = totalRaceDist - p.distance;
+                    const speed = p.speed > 0.1 ? p.speed : 0.5; 
+                    const msNeeded = (remainingDist / speed) * 16.66;
+                    p.finishTime = elapsedTime + msNeeded;
+                }
+            });
+            setTimeout(showGameOver, 1500); 
+        }
+
+        // --- 3D SETUP ---
+        function initScene() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = '';
+            scene = new THREE.Scene();
+            textureLoader = new THREE.TextureLoader();
+            
+            const skyUrl = setupData.bgUrl || ASSETS.sky;
+            textureLoader.load(skyUrl, (tex) => {
+                tex.mapping = THREE.EquirectangularReflectionMapping;
+                scene.background = tex;
+            });
+            
+            texRoad = textureLoader.load(ASSETS.road);
+            texRoad.wrapS = THREE.RepeatWrapping; texRoad.wrapT = THREE.RepeatWrapping;
+            texRoad.repeat.set(1, 20); 
+            texTire = textureLoader.load(ASSETS.tire);
+
+            BIKES.forEach(b => {
+                if(!texBikeMap[b.id]) texBikeMap[b.id] = textureLoader.load(b.tex);
+            });
+
+            scene.fog = new THREE.Fog(0x1a1a2e, 20, 150);
+            const amb = new THREE.AmbientLight(0xffffff, 0.8); scene.add(amb);
+            const dir = new THREE.DirectionalLight(0xffffff, 1.5); dir.position.set(10, 20, 10); scene.add(dir);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setScissorTest(true); 
+            container.appendChild(renderer.domElement);
+
+            // FIX: Tambah jumlah segmen jalan jadi 20 agar tidak hilang di lap tinggi
+            for(let i=0; i<20; i++) { createRoadSegment(-(ROAD_LENGTH/2) - (ROAD_LENGTH * i)); }
+        }
+
+        function createRoadSegment(zPos) {
+            const geo = new THREE.PlaneGeometry(60, ROAD_LENGTH, 1, 1);
+            const mat = new THREE.MeshStandardMaterial({ map: texRoad, roughness: 0.8, color: 0xaaaaaa });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.rotation.x = -Math.PI/2; mesh.position.z = zPos; mesh.frustumCulled = false;
+            scene.add(mesh); roads.push(mesh);
+        }
+
+        function createBike(color, texUrl) {
+            const g = new THREE.Group();
+            let bikeTex = texUrl ? textureLoader.load(texUrl) : texBikeMap[setupData.bikeId];
+            
+            const geo = new THREE.PlaneGeometry(2.5, 2.5); 
+            const mat = new THREE.MeshBasicMaterial({ 
+                map: bikeTex, 
+                transparent: true, 
+                side: THREE.DoubleSide,
+                alphaTest: 0.1 
+            });
+            const sprite = new THREE.Mesh(geo, mat);
+            sprite.position.y = 1.25; 
+            g.add(sprite);
+
+            const shadowGeo = new THREE.CircleGeometry(1, 32);
+            const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0.5, transparent: true });
+            const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+            shadow.rotation.x = -Math.PI / 2;
+            shadow.position.y = 0.02;
+            g.add(shadow);
+
+            const markGeo = new THREE.ConeGeometry(0.2, 0.3, 4);
+            const markMat = new THREE.MeshBasicMaterial({ color: color });
+            const marker = new THREE.Mesh(markGeo, markMat);
+            marker.position.y = 2.6; 
+            marker.rotation.z = Math.PI; 
+            g.add(marker);
+
+            return g;
+        }
+
+        // --- GAME LOOP ---
+        function animate() {
+            if (!gameActive) return;
+            requestAnimationFrame(animate);
+            let trailingZ = -Infinity;
+            players.forEach(p => { if(p.mesh.position.z > trailingZ) trailingZ = p.mesh.position.z; });
+            
+            roads.forEach(r => {
+                if (r.position.z > (trailingZ + ROAD_LENGTH/2 + 200)) { 
+                     let frontZ = Infinity;
+                     roads.forEach(road => { if(road.position.z < frontZ) frontZ = road.position.z; });
+                     r.position.z = frontZ - ROAD_LENGTH;
+                }
+            });
+
+            // Calculate Ranks
+            let activePlayers = [...players];
+            activePlayers.sort((a, b) => b.distance - a.distance);
+            activePlayers.forEach((p, idx) => {
+                p.rank = idx + 1;
+            });
+
+            players.forEach(p => p.update());
+            
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            renderer.setSize(width, height);
+            
+            let n = players.length;
+            if (currentMode === 'STORY') n = 1; 
+
+            // --- FIXED SPLIT SCREEN LOGIC ---
+            if (currentMode === 'VERSUS') {
+                const stripWidth = width / n;
+                players.forEach((p, i) => {
+                    const left = i * stripWidth;
+                    renderer.setViewport(left, 0, stripWidth, height);
+                    renderer.setScissor(left, 0, stripWidth, height);
+                    p.camera.aspect = stripWidth / height;
+                    p.camera.updateProjectionMatrix();
+                    renderer.render(scene, p.camera);
+                });
+            } else {
+                // Story Mode (Full Screen)
+                renderer.setViewport(0, 0, width, height);
+                renderer.setScissor(0, 0, width, height);
+                players[0].camera.aspect = width / height;
+                players[0].camera.updateProjectionMatrix();
+                renderer.render(scene, players[0].camera);
+            }
+        }
+
+        // --- GAME LOGIC ---
+        function startCountdown() {
+            isCountingDown = true; raceStartTime = null;
+            const layer = document.getElementById('countdown-layer'); layer.classList.remove('hide'); layer.innerHTML = '';
+            let count = 3;
+            function showNumber() {
+                if (count > 0) { 
+                    layer.innerHTML = `<div class="countdown-text" style="color:red">${count}</div>`; 
+                    SoundManager.playBeep(440, 0.1); // High Beep
+                    count--; setTimeout(showNumber, 1000); 
+                }
+                else if (count === 0) { 
+                    layer.innerHTML = `<div class="countdown-text" style="color:#00ff66">GO!</div>`; 
+                    SoundManager.playBeep(880, 0.3); // Higher Long Beep
+                    raceStartTime = Date.now(); count--; setTimeout(showNumber, 1000); 
+                }
+                else { layer.classList.add('hide'); isCountingDown = false; }
+            }
+            showNumber();
+        }
+
+        function checkAllFinished() {
+            if (currentMode !== 'STORY') {
+                if (players.every(p => p.finished || p.hasQuit)) setTimeout(showGameOver, 2000);
+            }
+        }
+
+        // --- MENU LOGIC ---
+        window.goToMainMenu = () => { gameActive = false; toggleScreen('main-menu'); };
+        window.showStoryMenu = () => {
+            toggleScreen('story-menu');
+            document.getElementById('story-points').innerText = `Total Poin Musim: ${globalSeasonPoints}`;
+            const cont = document.getElementById('level-container');
+            cont.innerHTML = '';
+            STORY_LEVELS.forEach(lvl => {
+                const div = document.createElement('div');
+                div.className = `level-card ${lvl.locked ? '' : 'unlocked'}`;
+                div.style.backgroundImage = `url('${BACKGROUNDS[lvl.bgIdx].url}')`;
+                div.innerHTML = `
+                    <div class="level-card-overlay">
+                        <div class="lvl-title">${lvl.name}</div>
+                        <div class="lvl-desc">${lvl.laps} Laps</div>
+                        ${lvl.locked ? '<div style="color:red; margin-top:5px; font-weight:bold;">LOCKED</div>' : ''}
+                    </div>
+                `;
+                if(!lvl.locked) div.onclick = () => startStoryLevel(lvl.id);
+                cont.appendChild(div);
+            });
+        };
+        
+        window.showVersusMenu = () => { 
+            currentMode = 'VERSUS';
+            toggleScreen('versus-menu'); 
+            setPlayers(2); setLaps(3); 
+        };
+        
+        window.setPlayers = (n) => { 
+            setupData.playerCount = n; 
+            updateBtnGroup('player-select', n + ' Player'); 
+        };
+        window.setLaps = (n) => { 
+            setupData.laps = n; 
+            updateBtnGroup('lap-select', n + ' Lap'); 
+        };
+        
+        window.startStoryLevel = (levelId) => {
+            const lvl = STORY_LEVELS.find(l => l.id === levelId);
+            if (lvl.locked) return;
+            currentMode = 'STORY';
+            setupData = { playerCount: 1, laps: lvl.laps, aiSpeed: lvl.aiSpeed, bgUrl: BACKGROUNDS[lvl.bgIdx].url, bikeId: 0 };
+            showBikeSelect();
+        };
+
+        window.showTrackSelect = () => {
+            toggleScreen('track-select-menu');
+            const cont = document.getElementById('track-container');
+            cont.innerHTML = '';
+            BACKGROUNDS.forEach(bg => {
+                const div = document.createElement('div');
+                div.className = 'card-item';
+                div.innerHTML = `<img src="${bg.url}"><div class="card-title">${bg.name}</div>`;
+                div.onclick = () => {
+                    setupData.bgUrl = bg.url;
+                    showBikeSelect();
+                };
+                cont.appendChild(div);
+            });
+        };
+
+        // --- NEW VERSUS BIKE SELECTION LOGIC ---
+        window.showBikeSelect = () => {
+            toggleScreen('bike-select-menu');
+            // Reset state
+            versusBikeSelections = {};
+            currentSelectingPlayer = 0;
+            
+            if (currentMode === 'VERSUS') {
+                updateVersusBikeUI();
+            } else {
+                // Story Mode UI
+                document.getElementById('bike-select-title').innerText = "Pilih Motor";
+                document.getElementById('bike-select-desc').innerText = "Pilih kendaraan untuk Story Mode";
+                document.getElementById('story-start-btn').style.display = "block";
+                renderBikeGrid();
+            }
+        };
+
+        function updateVersusBikeUI() {
+            document.getElementById('story-start-btn').style.display = "none";
+            document.getElementById('bike-select-title').innerHTML = `PEMAIN <span style="color:${'#'+COLORS[currentSelectingPlayer].toString(16)}">${currentSelectingPlayer + 1}</span> MEMILIH`;
+            document.getElementById('bike-select-desc').innerText = `Silakan pilih motor yang belum digunakan.`;
+            renderBikeGrid();
+        }
+
+        function renderBikeGrid() {
+            const cont = document.getElementById('bike-container');
+            cont.innerHTML = '';
+            BIKES.forEach(b => {
+                const div = document.createElement('div');
+                div.className = `card-item`;
+                
+                let isSelectedByMe = false;
+                let isTaken = false;
+                let takenBy = -1;
+
+                if (currentMode === 'VERSUS') {
+                    for(let pid in versusBikeSelections) {
+                        if(versusBikeSelections[pid] === b.id) {
+                            isTaken = true;
+                            takenBy = parseInt(pid) + 1;
+                        }
+                    }
+                } else {
+                    if (setupData.bikeId === b.id) isSelectedByMe = true;
+                }
+
+                if (isTaken) {
+                    div.classList.add('disabled');
+                    div.innerHTML = `<div class="owner-badge">P${takenBy}</div>`;
+                }
+                
+                if (isSelectedByMe) div.classList.add('selected');
+
+                div.innerHTML += `<img src="${b.thumb}"><div class="card-title">${b.name}</div>`;
+                
+                div.onclick = () => {
+                    if (isTaken) return; 
+
+                    if (currentMode === 'VERSUS') {
+                        versusBikeSelections[currentSelectingPlayer] = b.id;
+                        currentSelectingPlayer++;
+                        
+                        if (currentSelectingPlayer >= setupData.playerCount) {
+                            startGame();
+                        } else {
+                            updateVersusBikeUI();
+                        }
+                    } else {
+                        setupData.bikeId = b.id;
+                        Array.from(cont.children).forEach(c => c.classList.remove('selected'));
+                        div.classList.add('selected');
+                    }
+                };
+                cont.appendChild(div);
+            });
+        }
+
+        window.confirmStartGame = () => {
+            startGame();
+        };
+
+        window.quitGame = (playerId) => { if(players[playerId]) players[playerId].quitRace(); };
+
+        function toggleScreen(id) { document.querySelectorAll('.screen').forEach(el => el.classList.add('hide')); document.getElementById(id).classList.remove('hide'); }
+        function updateBtnGroup(id, txt) { document.getElementById(id).querySelectorAll('button').forEach(b => { if(b.innerText.includes(txt)) b.classList.add('active'); else b.classList.remove('active'); }); }
+
+        function startGame() {
+            document.querySelectorAll('.screen').forEach(el => el.classList.add('hide'));
+            document.getElementById('game-ui').classList.remove('hide');
+            initScene();
+            players = []; finishOrder = []; 
+            const uiContainer = document.getElementById('game-ui');
+            uiContainer.innerHTML = ''; uiContainer.className = '';
+            
+            let uiCount = (currentMode === 'STORY') ? 1 : setupData.playerCount;
+            let totalBikes = (currentMode === 'STORY') ? 5 : setupData.playerCount;
+            
+            uiContainer.classList.add(`grid-${uiCount}`);
+
+            // Create Human Players
+            for (let i = 0; i < uiCount; i++) {
+                let startOffset = i - (totalBikes - 1) / 2;
+                let chosenBikeUrl;
+                
+                if(currentMode === 'VERSUS') {
+                    let bikeId = versusBikeSelections[i];
+                    chosenBikeUrl = BIKES[bikeId].tex;
+                } else {
+                    chosenBikeUrl = BIKES[setupData.bikeId].tex;
+                }
+
+                let p = new Player(i, COLORS[i], false, startOffset, chosenBikeUrl);
+                players.push(p); scene.add(p.mesh);
+
+                let markersHTML = `<div id="marker-p${i}-in-p${i}" class="minimap-marker" style="background:${'#'+COLORS[i].toString(16)}; z-index:2; border:1px solid white;"></div>`;
+                for(let j=0; j<totalBikes; j++) { if(j!==i) markersHTML += `<div id="marker-p${j}-in-p${i}" class="minimap-marker" style="background: white; width:12px; left:-1px;"></div>`; }
+
+                const panel = document.createElement('div');
+                panel.className = `player-panel`; panel.id = `panel-p${i}`;
+                panel.innerHTML = `
+                    <div class="p-color-bar" style="background:${'#'+COLORS[i].toString(16)}"></div>
+                    <div class="hud-top">
+                        <div class="hud-left">
+                            <div class="hud-info-box">
+                                <div style="color:${'#'+COLORS[i].toString(16)}; font-weight:bold;">P${i+1}</div>
+                                <div class="lap-info" style="color:#aaa;">Lap 1/${setupData.laps}</div>
+                                <div class="rank-display">POS: 1/${totalBikes}</div>
+                                <div class="timer-display">0:00.00</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <div class="speed-box hud-info-box"><span class="speed-text">0 km/h</span></div>
+                            <div class="minimap-container">${markersHTML}</div>
+                            <button class="quit-btn" onclick="quitGame(${i})">QUIT</button>
+                        </div>
+                    </div>
+                    <div class="feedback-overlay" id="fb-p${i}">NICE!</div>
+                    <div class="lap-popup" id="lap-popup-p${i}">LAP 2</div>
+                    <div class="finish-text">FINISH!</div>
+                    <div class="math-box">
+                        <div class="math-question">Ready?</div>
+                        <div class="math-options"><button class="math-btn">A</button><button class="math-btn">B</button><button class="math-btn">C</button></div>
+                    </div>
+                `;
+                uiContainer.appendChild(panel); p.generateMath();
+            }
+
+            // Create AI
+            if (currentMode === 'STORY') {
+                for(let j=1; j<=4; j++) {
+                    let startOffset = j - (totalBikes - 1) / 2;
+                    let aiBikeId = (setupData.bikeId + j) % 5; 
+                    let ai = new Player(j, COLORS[j], true, startOffset, BIKES[aiBikeId].tex);
+                    players.push(ai); scene.add(ai.mesh);
+                    let aiMarker = document.getElementById(`marker-p${j}-in-p0`);
+                    if(aiMarker) aiMarker.style.background = '#' + COLORS[j].toString(16);
+                }
+            }
+
+            gameActive = true; animate(); startCountdown();
+        }
+
+        function showGameOver() {
+            gameActive = false; document.getElementById('game-ui').classList.add('hide');
+            const goScreen = document.getElementById('game-over'); goScreen.classList.remove('hide');
+            const sb = document.getElementById('score-board');
+            sb.innerHTML = `<div class="score-row score-header"><span>Pos</span><span>Pembalap</span><span>Waktu & Poin</span></div>`;
+            
+            let allPlayers = [...players];
+            allPlayers.sort((a, b) => {
+                if (a.finished && b.finished) return a.finishTime - b.finishTime;
+                if (a.finished) return -1;
+                if (b.finished) return 1;
+                return b.distance - a.distance;
+            });
+
+            allPlayers.forEach((p, idx) => {
+                let name = p.isAI ? `CPU Opponent ${p.id}` : `Player ${p.id+1}`;
+                let timeStr = p.finished ? formatTime(p.finishTime) : "DNF";
+                let points = (p.finished && idx < POINTS_SYSTEM.length) ? POINTS_SYSTEM[idx] : 0;
+                if (currentMode === 'STORY' && !p.isAI) globalSeasonPoints += points;
+                let row = document.createElement('div'); row.className = 'score-row';
+                if(p.id === 0 && currentMode === 'STORY') row.style.border = "2px solid #00eaff"; 
+                row.innerHTML = `<span style="color:${'#'+p.color.toString(16)}">#${idx+1}</span><span>${name}</span><span>${timeStr} <b style="color:#ffd700">(+${points} Pts)</b></span>`;
+                sb.appendChild(row);
+            });
+            if (currentMode === 'STORY') {
+                let playerRank = allPlayers.findIndex(p => p.id === 0);
+                if (playerRank !== -1 && playerRank < 3 && allPlayers[playerRank].finished) {
+                    unlockNextLevel(); sb.appendChild(createMsg(`<h3 style="color:#00ff66">SELAMAT! LEVEL BERIKUTNYA TERBUKA</h3>`));
+                } else {
+                    sb.appendChild(createMsg(`<h3 style="color:#ff3333">GAGAL PODIUM. COBA LAGI!</h3>`));
+                }
+                sb.appendChild(createMsg(`<h2 style="margin-top:20px; color:#ffd700">TOTAL POIN MUSIM: ${globalSeasonPoints}</h2>`));
+            }
+        }
+        function createMsg(html) { const d = document.createElement('div'); d.innerHTML = html; return d; }
+        function unlockNextLevel() {
+            let lvl = STORY_LEVELS.find(l => l.laps === setupData.laps && l.aiSpeed === setupData.aiSpeed);
+            if (lvl) { let idx = STORY_LEVELS.indexOf(lvl) + 1; if (idx < STORY_LEVELS.length) STORY_LEVELS[idx].locked = false; }
+        }
+    </script>
 </body>
-
 </html>
-
